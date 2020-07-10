@@ -35,7 +35,7 @@ public class AdminUserService {
 
     public PageDataResult getUserList(UserSearchDTO userSearch, Integer pageNum, Integer pageSize) {
         PageDataResult pageDataResult = new PageDataResult();
-        List<AdminUserDTO> baseAdminUsers = userDao.getUserList(userSearch);
+        List<AdminUserDTO> baseAdminUsers = userDao.getUsers(userSearch);
 
         PageHelper.startPage(pageNum, pageSize);
 
@@ -76,7 +76,7 @@ public class AdminUserService {
             }
             user.setRegTime(DateUtils.getCurrentDate());
             user.setUserStatus(1);
-            userDao.save(user);
+            userDao.insert(user);
             data.put("code", 1);
             data.put("msg", "新增成功！");
             logger.info("用户[新增]，结果=新增成功！");
@@ -104,7 +104,7 @@ public class AdminUserService {
             String password = DigestUtils.Md5(username, user.getSysUserPwd());
             user.setSysUserPwd(password);
         }
-        userDao.save(user);
+        userDao.insert(user);
         data.put("code", 1);
         data.put("msg", "更新成功！");
         logger.info("用户[更新]，结果=更新成功！");
@@ -112,7 +112,7 @@ public class AdminUserService {
     }
 
     public BaseAdminUser getUserById(Integer id) {
-        return userDao.findById(id).get();
+        return userDao.selectById(id);
     }
 
 
@@ -120,7 +120,7 @@ public class AdminUserService {
         Map<String, Object> data = new HashMap<>();
         try {
             // 删除用户
-            userDao.updateUserStatus(status, id);
+            userDao.updateStatus(status, id);
             data.put("code", 1);
             data.put("msg", "删除用户成功");
             logger.info("删除用户成功");
@@ -134,7 +134,7 @@ public class AdminUserService {
     public Map<String, Object> recoverUser(Integer id, Integer status) {
         Map<String, Object> data = new HashMap<>();
         try {
-            userDao.updateUserStatus(status, id);
+            userDao.updateStatus(status, id);
             data.put("code", 1);
             data.put("msg", "恢复用户成功");
         } catch (Exception e) {

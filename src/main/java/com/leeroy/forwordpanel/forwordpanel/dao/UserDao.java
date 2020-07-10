@@ -1,17 +1,19 @@
 package com.leeroy.forwordpanel.forwordpanel.dao;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.leeroy.forwordpanel.forwordpanel.dto.AdminUserDTO;
 import com.leeroy.forwordpanel.forwordpanel.dto.UserSearchDTO;
 import com.leeroy.forwordpanel.forwordpanel.model.BaseAdminUser;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
 @Mapper
-public interface UserDao extends JpaRepository<BaseAdminUser, Integer> {
+public interface UserDao extends BaseMapper<BaseAdminUser> {
+
+
     @Select("<script>" +
             "select * from base_admin_user " +
             "<where>" +
@@ -19,17 +21,17 @@ public interface UserDao extends JpaRepository<BaseAdminUser, Integer> {
             " and sys_user_name=#{sysUserName}" +
             "</if>" +
             "<if test='userPhone!=null'>" +
-            " and userPhone=#{sysUserName}" +
+            " and userPhone=#{userPhone}" +
             "</if>" +
             "</where>" +
             "</script>")
-    List<AdminUserDTO> getUserList(UserSearchDTO userSearch);
+    List<AdminUserDTO> getUsers(UserSearchDTO userSearch);
 
     @Select("<script>" +
             "select * from base_admin_user " +
-            "where sys_user_name=#{sysUserName}" +
+            "where sys_user_name=#{sysUserName} " +
             "<if test='id!=null'>" +
-            "and id<>#{id} " +
+            "and <![CDATA[ id<>#{id} ]]> " +
             "</if>" +
             "</script>")
     BaseAdminUser getUserByUserName(String sysUserName, Integer id);
@@ -38,7 +40,7 @@ public interface UserDao extends JpaRepository<BaseAdminUser, Integer> {
     void updatePwd(String username, String password);
 
     @Update("update base_admin_user set user_status=#{userStatus} where id=#{id}")
-    void updateUserStatus(Integer userStatus, Integer id);
+    void updateStatus(Integer userStatus, Integer id);
 
     AdminUserDTO getAdminUserDTOBySysUserName(String username);
 }
