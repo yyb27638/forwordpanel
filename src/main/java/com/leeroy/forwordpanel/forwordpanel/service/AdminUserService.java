@@ -35,12 +35,10 @@ public class AdminUserService {
 
     public PageDataResult getUserList(UserSearchDTO userSearch, Integer pageNum, Integer pageSize) {
         PageDataResult pageDataResult = new PageDataResult();
-        List<AdminUserDTO> baseAdminUsers = userDao.getUsers(userSearch);
-
+        List<BaseAdminUser> baseAdminUsers = userDao.getUsers(userSearch);
         PageHelper.startPage(pageNum, pageSize);
-
         if (baseAdminUsers.size() != 0) {
-            PageInfo<AdminUserDTO> pageInfo = new PageInfo<>(baseAdminUsers);
+            PageInfo<BaseAdminUser> pageInfo = new PageInfo<>(baseAdminUsers);
             pageDataResult.setList(baseAdminUsers);
             pageDataResult.setTotals((int) pageInfo.getTotal());
         }

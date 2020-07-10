@@ -165,7 +165,7 @@ function openUser(data,title){
         fixed:false,
         resize :false,
         shadeClose: true,
-        area: ['550px'],
+        area: ['600px'],
         content:$('#setUser'),
         end:function(){
             cleanUser();

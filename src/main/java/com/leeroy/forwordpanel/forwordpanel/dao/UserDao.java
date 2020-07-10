@@ -15,7 +15,7 @@ public interface UserDao extends BaseMapper<BaseAdminUser> {
 
 
     @Select("<script>" +
-            "select * from base_admin_user " +
+            "select id, sys_user_name as sysUserName, sys_user_pwd as sysUserPwd,role_id as roleId, user_phone as userPhone, reg_time as regTime, user_status as userStatus from base_admin_user " +
             "<where>" +
             "<if test='sysUserName!=null'>" +
             " and sys_user_name=#{sysUserName}" +
@@ -25,7 +25,7 @@ public interface UserDao extends BaseMapper<BaseAdminUser> {
             "</if>" +
             "</where>" +
             "</script>")
-    List<AdminUserDTO> getUsers(UserSearchDTO userSearch);
+    List<BaseAdminUser> getUsers(UserSearchDTO userSearch);
 
     @Select("<script>" +
             "select * from base_admin_user " +

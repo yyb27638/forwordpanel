@@ -1,8 +1,11 @@
 package com.leeroy.forwordpanel.forwordpanel.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 
+@TableName("base_admin_user")
 @Data
 public class BaseAdminUser {
     /**
@@ -13,6 +16,7 @@ public class BaseAdminUser {
     /**
      * 系统用户名称
      */
+    @TableField("sys_user_name")
     private String sysUserName;
 
     /**
