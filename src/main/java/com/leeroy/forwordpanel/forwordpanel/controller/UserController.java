@@ -1,31 +1,31 @@
 package com.leeroy.forwordpanel.forwordpanel.controller;
 
 
+import com.leeroy.forwordpanel.forwordpanel.common.WebCurrentData;
+import com.leeroy.forwordpanel.forwordpanel.common.response.ApiResponse;
 import com.leeroy.forwordpanel.forwordpanel.common.response.PageDataResult;
-import com.leeroy.forwordpanel.forwordpanel.dto.LoginDTO;
+import com.leeroy.forwordpanel.forwordpanel.dao.UserPortDao;
 import com.leeroy.forwordpanel.forwordpanel.dto.UserSearchDTO;
-import com.leeroy.forwordpanel.forwordpanel.model.BaseAdminUser;
-import com.leeroy.forwordpanel.forwordpanel.service.AdminUserService;
+import com.leeroy.forwordpanel.forwordpanel.model.User;
+import com.leeroy.forwordpanel.forwordpanel.model.UserPort;
+import com.leeroy.forwordpanel.forwordpanel.service.UserPortService;
+import com.leeroy.forwordpanel.forwordpanel.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * @Title: UserController
- * @Description: 系统用户管理
- * @author: youqing
- * @version: 1.0
- * @date: 2018/11/20 15:17
+ * 用户管理
  */
 @Controller
 @RequestMapping("user")
@@ -34,61 +34,33 @@ public class UserController {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private AdminUserService adminUserService;
+    private UserService userService;
+
+    @Autowired
+    private UserPortService userPortService;
 
 
     /**
-     *
-     * 功能描述: 登入系统
-     *
-     * @param:
-     * @return:
-     * @auther: youqing
-     * @date: 2018/11/22 15:47
-     */
-    @RequestMapping("login")
-    @ResponseBody
-    public Map<String,Object> login(HttpServletRequest request, LoginDTO loginDTO, HttpSession session){
-        logger.info("进行登陆");
-        Map<String,Object> data = new HashMap();
-        String userName = loginDTO.getUsername().trim();
-        String password = loginDTO.getPassword().trim();
-        String rememberMe = loginDTO.getRememberMe();
-        String host = request.getRemoteAddr();
-        return data;
-    }
-
-    /**
-     *
-     * 功能描述: 修改密码
-     *
-     * @param:
-     * @return:
-     * @auther: youqing
-     * @date: 2018/11/22 17:26
+     * 设置密码
+     * @param pwd
+     * @param isPwd
+     * @return
      */
     @RequestMapping("setPwd")
     @ResponseBody
-    public Map<String,Object> setP(String pwd, String isPwd){
+    public ApiResponse setPassword(String pwd, String isPwd) {
         logger.info("进行密码重置");
-        Map<String,Object> data = new HashMap();
-        if(!pwd.equals(isPwd)){
-            data.put("code",0);
-            data.put("message","两次输入的密码不一致!");
-            logger.error("两次输入的密码不一致!");
-            return data;
+        Map<String, Object> data = new HashMap();
+        if (!pwd.equals(isPwd)) {
+            return ApiResponse.error("400", "两次密码不一致");
         }
         //获取当前登陆的用户信息
-        BaseAdminUser user = null;
-        adminUserService.updatePwd(user.getSysUserName(),pwd);
-        data.put("code",1);
-        data.put("msg","修改密码成功！");
-        logger.info("用户修改密码成功！");
-        return data;
+        User user = WebCurrentData.getUser();
+        userService.updatePwd(user.getUsername(), pwd);
+        return ApiResponse.ok();
     }
 
     /**
-     *
      * 功能描述: 跳到系统用户列表
      *
      * @param:
@@ -98,34 +70,30 @@ public class UserController {
      */
     @RequestMapping("/userManage")
     public String userManage() {
-        return "/user/userManage";
+        return "user/userManage";
     }
 
     /**
+     * 用户分页
      *
-     * 功能描述: 分页查询用户列表
-     *
-     * @param:
-     * @return:
-     * @auther: youqing
-     * @date: 2018/11/21 11:10
+     * @param pageNum
+     * @param pageSize
+     * @param userSearch
+     * @return
      */
     @RequestMapping(value = "/getUserList", method = RequestMethod.POST)
     @ResponseBody
-    public PageDataResult getUserList(@RequestParam("pageNum") Integer pageNum,
-                                      @RequestParam("pageSize") Integer pageSize,/*@Valid PageRequest page,*/ UserSearchDTO userSearch) {
-        /*logger.info("分页查询用户列表！搜索条件：userSearch：" + userSearch + ",pageNum:" + page.getPageNum()
-                + ",每页记录数量pageSize:" + page.getPageSize());*/
+    public PageDataResult getUserList(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize, UserSearchDTO userSearch) {
         PageDataResult pdr = new PageDataResult();
         try {
-            if(null == pageNum) {
+            if (null == pageNum) {
                 pageNum = 1;
             }
-            if(null == pageSize) {
+            if (null == pageSize) {
                 pageSize = 10;
             }
             // 获取用户列表
-            pdr = adminUserService.getUserList(userSearch, pageNum ,pageSize);
+            pdr = userService.getUserList(userSearch, pageNum, pageSize);
             logger.info("用户列表查询=pdr:" + pdr);
 
         } catch (Exception e) {
@@ -137,51 +105,62 @@ public class UserController {
 
 
     /**
+     * 新增/更新用户
      *
-     * 功能描述: 新增和更新系统用户
-     *
-     * @param:
-     * @return:
-     * @auther: youqing
-     * @date: 2018/11/22 10:14
+     * @param user
+     * @return
      */
     @RequestMapping(value = "/setUser", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> setUser(BaseAdminUser user) {
+    public ApiResponse setUser(User user) {
         logger.info("设置用户[新增或更新]！user:" + user);
-        Map<String,Object> data = new HashMap();
-        if(user.getId() == null){
-            data = adminUserService.addUser(user);
-        }else{
-            data = adminUserService.updateUser(user);
+        Map<String, Object> data = new HashMap();
+        if (user.getId() == null) {
+            return userService.addUser(user);
+        } else {
+            return userService.updateUser(user);
         }
-        return data;
     }
 
 
     /**
+     * 禁用用户
      *
-     * 功能描述: 删除/恢复 用户
-     *
-     * @param:
-     * @return:
-     * @auther: youqing
-     * @date: 2018/11/22 11:59
+     * @param id
+     * @return
      */
-    @RequestMapping(value = "/updateUserStatus", method = RequestMethod.POST)
+    @RequestMapping(value = "/disable", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> updateUserStatus(@RequestParam("id") Integer id, @RequestParam("status") Integer status) {
-        logger.info("删除/恢复用户！id:" + id+" status:"+status);
-        Map<String, Object> data = new HashMap<>();
-        if(status == 0){
-            //删除用户
-            data = adminUserService.delUser(id,status);
-        }else{
-            //恢复用户
-            data = adminUserService.recoverUser(id,status);
-        }
-        return data;
+    public ApiResponse disable(@RequestParam("id") Integer id) {
+         return userService.disableUser(id);
+    }
+
+    /**
+     * 启用用户
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/enable", method = RequestMethod.POST)
+    @ResponseBody
+    public ApiResponse enable(@RequestParam("id") Integer id) {
+        return userService.enableUser(id);
     }
 
 
+    /**
+     * 启用用户
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @ResponseBody
+    public ApiResponse delete(@RequestParam("id") Integer id) {
+        List<UserPort> userPortList = userPortService.findUserPortList(id);
+        if(!CollectionUtils.isEmpty(userPortList)){
+            return ApiResponse.error("401", "请先删除用户端口");
+        }
+        return userService.delUser(id);
+    }
 }

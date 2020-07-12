@@ -16,7 +16,7 @@ function setPwd(){
     var isPwd=$("#isPwd").val();
     $.post("/user/setPwd",{"pwd":pwd,"isPwd":isPwd},function(data){
         console.log("data:"+data);
-        if(data.code=="1"){
+        if(data.code==="0"){
             layer.alert("操作成功",function () {
                 layer.closeAll();
                 window.location.href="/logout";

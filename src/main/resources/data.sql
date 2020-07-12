@@ -1,17 +1,55 @@
---
-CREATE TABLE base_admin_user  (
+CREATE TABLE sys_user  (
   id int NOT NULL AUTO_INCREMENT ,
-  sys_user_name varchar(50) NOT NULL,
-  sys_user_pwd varchar(250) DEFAULT NULL ,
-  role_id int DEFAULT NULL ,
-  user_phone varchar(11) NOT NULL ,
-  reg_time varchar(32) NOT NULL ,
-  user_status int NOT NULL DEFAULT 0
-)
---
--- -- ----------------------------
--- -- Records of base_admin_user
--- -- ----------------------------
-INSERT INTO base_admin_user VALUES (1, 'admin', '3ef7164d1f6167cb9f2658c07d3c2f0a', 1, '13411182215', '2018-11-22 10:57:33', 1);
-INSERT INTO base_admin_user VALUES (2, 'jackson', '6565673a6caee66a6acbd51415bddbda', 2, '19563648695', '2018-11-22 10:57:33', 1);
-INSERT INTO base_admin_user VALUES (4, 'alice', '5e1030d25f5ca46aac4c0369b908d762', 2, '11111111111', '2018-11-22 11:01:58', 1);
+  username varchar(50) NOT NULL,
+  password varchar(250) DEFAULT NULL ,
+  user_phone varchar(11) ,
+  telegram varchar(11) ,
+  reg_time BIGINT ,
+  data_limit BIGINT,
+  expire_time BIGINT,
+  data_usage BIGINT,
+  user_type INTEGER NOT NULL DEFAULT 1,
+  disabled BOOLEAN ,
+  deleted BOOLEAN
+);
+
+INSERT INTO sys_user VALUES (1, 'admin', 'a66abb5684c45962d887564f08346e8d', '11111111111','leeroy',1594463119000, 107374182400,null,null, 0, false, false);
+
+CREATE TABLE user_port  (
+  id int NOT NULL AUTO_INCREMENT ,
+  local_port int NOT NULL,
+  user_id int NOT NULL ,
+  data_limit BIGINT,
+  data_usage BIGINT,
+  disabled BOOLEAN ,
+  deleted BOOLEAN ,
+  expire_time BIGINT,
+  create_time BIGINT ,
+  update_time BIGINT
+);
+
+
+CREATE TABLE user_token  (
+  id int NOT NULL AUTO_INCREMENT ,
+  token varchar(250) NOT NULL,
+  username varchar(50) NOT NULL,
+  user_id INTEGER ,
+  create_time BIGINT ,
+  update_time BIGINT,
+  expire_time BIGINT
+);
+
+CREATE TABLE user_port_forward  (
+  id int NOT NULL AUTO_INCREMENT ,
+    user_id int NOT NULL ,
+  local_port int NOT NULL,
+  remote_ip varchar(64),
+  remote_host varchar(64),
+  remote_port int,
+  data_limit BIGINT,
+  data_usage BIGINT,
+  disabled BOOLEAN ,
+  deleted BOOLEAN ,
+  create_time BIGINT ,
+  update_time BIGINT
+);

@@ -7,10 +7,9 @@ $(function(){
     layui.use('element', function(){
         var element = layui.element;
         // 左侧导航区域（可配合layui已有的垂直导航）
-        $.get("/permission/getUserPerms",function(data){
-            if(data!=null){
-                console.log(data.perm)
-                getMenus(data.perm);
+        $.get("/getResource",function(data){
+            if(data && data.data.length>0){
+                getMenus(data.data);
                 element.render('nav');
             }else{
                 layer.alert("权限不足，请联系管理员",function () {
@@ -22,6 +21,7 @@ $(function(){
     });
 })
 var getMenus=function(data){
+    console.log('data', data)
     //回显选中
     var ul=$("<ul class='layui-nav layui-nav-tree' lay-filter='test'></ul>");
     for(var i=0;i < data.length;i++){

@@ -12,8 +12,14 @@ import lombok.Data;
  */
 @Data
 public class UserSearchDTO {
-    private String sysUserName;
+    private String username;
 
     private String userPhone;
+
+    private String telegram;
+
+    private Boolean disabled;
+
+    private Integer id;
 
 }

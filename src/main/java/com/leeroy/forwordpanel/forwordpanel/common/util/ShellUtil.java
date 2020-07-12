@@ -9,8 +9,12 @@ import java.io.InputStreamReader;
 public class ShellUtil {
 
     public static String execShell(String shell) {
+
         log.info("execute shell: {}", shell);
         try {
+            if(isWindows()){
+                return "";
+            }
             String[] cmd = new String[]{"/bin/sh", "-c", shell};
             Process ps = Runtime.getRuntime().exec(cmd);
             ps.waitFor();
@@ -28,5 +32,9 @@ public class ShellUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean isWindows() {
+        return System.getProperties().getProperty("os.name").toUpperCase().indexOf("WINDOWS") != -1;
     }
 }

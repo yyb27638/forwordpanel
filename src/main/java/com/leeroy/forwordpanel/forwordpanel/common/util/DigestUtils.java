@@ -21,4 +21,13 @@ public class DigestUtils {
     public static String Md5(String userName,String password){
         return org.apache.commons.codec.digest.DigestUtils.md5Hex(userName+password);
     }
+
+
+    public static String Md5(String userName,String password, Long time){
+        return org.apache.commons.codec.digest.DigestUtils.md5Hex(userName+password+time);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(org.apache.commons.codec.digest.DigestUtils.md5Hex("admin"+"123456"));
+    }
 }

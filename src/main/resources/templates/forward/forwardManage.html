@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head th:include="layout :: htmlhead" th:with="title='端口转发'">
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <!--头-->
+    <div th:replace="fragments/head :: header"></div>
+
+    <div class="layui-body" style="margin: 1%">
+
+        <!--<hr class="layui-bg-blue"/>-->
+        <table id="forwardList" lay-filter="forwardTable"></table>
+
+        <script type="text/html" id="optBar">
+            {{#  if(d.disabled == true){ }}
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="start">启用</a>
+            {{#  } else { }}
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="stop">停用</a>
+            {{#  } }}
+        </script>
+    </div>
+
+    <!--添加端口-->
+    <div id="startForward" class="layer_self_wrap" style="padding:20px; display:none;">
+        <form id="startForwardForm" class="layui-form layui-form-pane" method="post" action="" style="padding:20px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">本地端口</label>
+                <div class="layui-input-inline">
+                    <input id="localPort" name="localPort" lay-verify="required|number" autocomplete="off"
+                           onkeyup="this.value=this.value.replace(/\D/g,'')"
+                           onafterpaste="this.value=this.value.replace(/\D/g,'')" class="layui-input" type="text"/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">中转域名(IP)</label>
+                <div class="layui-input-inline">
+                    <input id="remoteHost" name="remoteHost" lay-verify="required" autocomplete="off"
+                           class="layui-input" type="text"/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">中转端口</label>
+                <div class="layui-input-inline">
+                    <input id="remotePort" name="remotePort" lay-verify="required|number" autocomplete="off"
+                           onkeyup="this.value=this.value.replace(/\D/g,'')"
+                           onafterpaste="this.value=this.value.replace(/\D/g,'')" class="layui-input" type="text"/>
+                </div>
+            </div>
+            <button class="layui-btn" lay-submit="" lay-filter="portForwardSubmit">启动</button>
+        </form>
+    </div>
+
+    <!--底部-->
+    <div th:replace="fragments/footer :: footer"></div>
+    <script src="/js/dateUtils.js"></script>
+    <script src="/js/forward/forward.js"></script>
+
+</div>
+<style type="text/css">
+    .layui-form-pane .layui-form-label{
+        width: 120px;
+    }
+</style>
+</body>
+</html>
