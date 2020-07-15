@@ -25,10 +25,10 @@ public class UserPortService {
      * 给用户分配端口
      * @param userPort
      */
-    public void save(UserPort userPort) {
+    public ApiResponse save(UserPort userPort) {
         if (userPort.getId() == null) {
             if (findByUserIdAndPort(userPort.getUserId(), userPort.getLocalPort()) != null) {
-                return;
+                return ApiResponse.error("401","该端口已被分配");
             }
             userPort.setDeleted(false);
             userPort.setDisabled(false);
@@ -40,6 +40,7 @@ public class UserPortService {
         }
         //创建中转记录
         userPortForwardService.createUserPortForward(userPort.getLocalPort(), userPort.getUserId());
+        return ApiResponse.ok();
     }
 
 

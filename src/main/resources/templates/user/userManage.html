@@ -102,7 +102,7 @@
                 <label class="layui-form-label">密码</label>
                 <div class="layui-input-inline">
                     <input id="password" name="password" autocomplete="off" class="layui-input" type="password"
-                           placeholder="默认初始密码：123456"/>
+                           placeholder="默认初始密码：XDZZ@123"/>
                 </div>
                 <div class="layui-form-mid layui-word-aux">请填写6位以上的密码</div>
             </div>
@@ -122,7 +122,6 @@
         <table id="userPortTableList" class="layui-table" lay-filter="userPortTable">
         </table>
         <script type="text/html" id="assignPortBar">
-            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
             {{#  if(d.disabled == true){ }}
             <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="enable">启用</a>
             {{#  } else { }}

@@ -1,6 +1,7 @@
 package com.leeroy.forwordpanel.forwordpanel.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -68,7 +69,7 @@ public class UserService {
                 return ApiResponse.error("400", "用户名已存在");
             }
             String username = user.getUsername();
-            if (user.getPassword() == null) {
+            if (StringUtils.isBlank(user.getPassword())) {
                 String password = DigestUtils.Md5(username, defaultPassword);
                 user.setPassword(password);
             } else {

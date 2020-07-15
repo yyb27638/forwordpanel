@@ -36,8 +36,7 @@ public class UserPortController {
         if(WebCurrentData.getUser().getUserType()>0){
             return ApiResponse.error("403", "您没有权限执行此操作");
         }
-        userPortService.save(userPort);
-        return ApiResponse.ok();
+        return userPortService.save(userPort);
     }
 
     @GetMapping("delete")

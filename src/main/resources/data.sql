@@ -53,3 +53,14 @@ CREATE TABLE user_port_forward  (
   create_time BIGINT ,
   update_time BIGINT
 );
+
+CREATE TABLE clash  (
+  id int NOT NULL ,
+  text CLOB NOT NULL,
+  user_id int NOT NULL ,
+  disabled BOOLEAN ,
+  deleted BOOLEAN ,
+  expire_time BIGINT,
+  create_time BIGINT ,
+  update_time BIGINT
+);
