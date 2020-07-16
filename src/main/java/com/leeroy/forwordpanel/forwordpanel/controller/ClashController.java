@@ -1,26 +1,15 @@
 package com.leeroy.forwordpanel.forwordpanel.controller;
 
-import com.leeroy.forwordpanel.forwordpanel.common.WebCurrentData;
 import com.leeroy.forwordpanel.forwordpanel.common.response.ApiResponse;
 import com.leeroy.forwordpanel.forwordpanel.model.Clash;
-import com.leeroy.forwordpanel.forwordpanel.model.UserPort;
-import com.leeroy.forwordpanel.forwordpanel.model.UserPortForward;
 import com.leeroy.forwordpanel.forwordpanel.service.ClashService;
-import com.leeroy.forwordpanel.forwordpanel.service.UserPortForwardService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringReader;
-import java.util.Date;
 
 @Controller
 public class ClashController {
@@ -38,35 +27,28 @@ public class ClashController {
         return "clash/index";
     }
 
-    /**
-     * 中转列表
-     *
-     * @return
-     */
+
     @ResponseBody
-    @GetMapping("getPortForwardList")
-    public ApiResponse getList() {
-        return ApiResponse.ok(clashService.findClashList());
-    }
-
-
     @GetMapping("getClashList")
     public ApiResponse getUserPortList(Integer userId) {
         return ApiResponse.ok(clashService.findClashList());
     }
 
-    @PostMapping("save")
+    @ResponseBody
+    @PostMapping("saveClash")
     public ApiResponse saveUserPort(@RequestBody Clash clash) {
         return clashService.save(clash);
     }
 
-    @GetMapping("delete")
+    @ResponseBody
+    @PostMapping("deleteClash")
     public ApiResponse delete(String id) {
         clashService.delClash(id);
         return ApiResponse.ok();
     }
 
 
+    @ResponseBody
     @GetMapping("clash/{id}")
     public void getClashFileById(@PathVariable String id, HttpServletResponse response) {
         Clash clash = clashService.findClashById(id);

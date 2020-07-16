@@ -13,6 +13,8 @@ public class Clash {
 
     @TableId(value = "id", type = IdType.ASSIGN_UUID)
     private String id;
+
+    private String configName;
     private Integer userId;
     private Boolean disabled;
     private Boolean deleted;

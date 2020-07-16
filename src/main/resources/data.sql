@@ -55,7 +55,8 @@ CREATE TABLE user_port_forward  (
 );
 
 CREATE TABLE clash  (
-  id int NOT NULL ,
+  id varchar(50) NOT NULL,
+  config_name varchar(50) NOT NULL,
   text CLOB NOT NULL,
   user_id int NOT NULL ,
   disabled BOOLEAN ,

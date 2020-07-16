@@ -211,7 +211,6 @@ function openUser(data, title) {
     if (data == null || data == "") {
         $("#id").val("");
     } else {
-        console.log(data)
         $("#id").val(data.id);
         $("#addUsername").val(data.username);
         $("#mobile").val(data.userPhone);

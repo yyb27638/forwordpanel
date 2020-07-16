@@ -9,6 +9,7 @@ import com.leeroy.forwordpanel.forwordpanel.model.Clash;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -23,7 +24,8 @@ public class ClashService {
      * 保存clash
      */
     public ApiResponse save(Clash clash) {
-        if (clash.getId() == null) {
+        clash.setUserId(WebCurrentData.getUserId());
+        if (StringUtils.isEmpty(clash.getId())) {
             clash.setDeleted(false);
             clash.setDisabled(false);
             clash.setCreateTime(System.currentTimeMillis());

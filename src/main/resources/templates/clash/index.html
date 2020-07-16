@@ -10,45 +10,40 @@
 
     <div class="layui-body" style="margin: 1%">
 
+        <button class="layui-btn layui-btn-normal" onclick="addClash()">添加配置文件</button>
         <!--<hr class="layui-bg-blue"/>-->
-        <table id="forwardList" lay-filter="forwardTable"></table>
+        <table id="clashList" lay-filter="clashTable"></table>
 
         <script type="text/html" id="optBar">
-            {{#  if(d.disabled == true){ }}
-            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="start">启用</a>
-            {{#  } else { }}
-            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="stop">停用</a>
-            {{#  } }}
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="copyLink">复制链接</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
         </script>
     </div>
 
     <!--添加端口-->
-    <div id="startForward" class="layer_self_wrap" style="padding:20px; display:none;">
-        <form id="startForwardForm" class="layui-form layui-form-pane" method="post" action="" style="padding:20px;">
+    <div id="clashDialog" class="layer_self_wrap" style="padding:20px; display:none;">
+        <form id="clashForm" class="layui-form" method="post" action="" style="padding:20px;">
+            <input id="id" type="hidden" name="id"/>
             <div class="layui-form-item">
-                <label class="layui-form-label">本地端口</label>
-                <div class="layui-input-inline">
-                    <input id="localPort" name="localPort" lay-verify="required|number" autocomplete="off"
-                           onkeyup="this.value=this.value.replace(/\D/g,'')"
-                           onafterpaste="this.value=this.value.replace(/\D/g,'')" class="layui-input" type="text"/>
+                <label class="layui-form-label">配置名称:</label>
+                <div class="layui-input-block">
+                    <input id="configName" name="configName" required lay-verify="required" placeholder="请输入" type="text" class="layui-input"></input>
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">中转域名(IP)</label>
-                <div class="layui-input-inline">
-                    <input id="remoteHost" name="remoteHost" lay-verify="required" autocomplete="off"
-                           class="layui-input" type="text"/>
+                <label class="layui-form-label">过期时间:</label>
+                <div class="layui-input-block">
+                    <input id="expireTime" name="expireTime" required lay-verify="required" placeholder="请输入" type="text" class="layui-input"></input>
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">中转端口</label>
-                <div class="layui-input-inline">
-                    <input id="remotePort" name="remotePort" lay-verify="required|number" autocomplete="off"
-                           onkeyup="this.value=this.value.replace(/\D/g,'')"
-                           onafterpaste="this.value=this.value.replace(/\D/g,'')" class="layui-input" type="text"/>
+                <label class="layui-form-label">YAML:</label>
+                <div class="layui-input-block">
+                    <textarea id="text" name="text" required lay-verify="required" placeholder="请输入" cols="20" rows="20" class="layui-textarea"></textarea>
                 </div>
             </div>
-            <button class="layui-btn" lay-submit="" lay-filter="portForwardSubmit">启动</button>
+            <button class="layui-btn" lay-submit="" lay-filter="clashSubmit">保存</button>
         </form>
     </div>
 

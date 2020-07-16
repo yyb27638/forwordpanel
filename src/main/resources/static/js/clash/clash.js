@@ -8,8 +8,8 @@ $(function () {
         var table = layui.table;
         form = layui.form;
         tableIns = table.render({
-            elem: '#forwardList',
-            url: '/getPortForwardList',
+            elem: '#clashList',
+            url: '/getClashList',
             method: 'get', //默认：get请求
             cellMinWidth: 80,
             page: true,
@@ -19,10 +19,8 @@ $(function () {
             },
             cols: [[
                 {type: 'numbers'}
-                , {field: 'localPort', title: '本地端口', align: 'center'}
-                , {field: 'remoteHost', title: '中转域名(IP)', align: 'center'}
-                , {field: 'remoteIp', title: '中转IP', align: 'center'}
-                , {field: 'remotePort', title: '中转端口', align: 'center'}
+                , {field: 'configName', title: '配置名称', align: 'center'}
+                , {field: 'expireTime', title: '到期时间', align: 'center'}
                 , {field: 'disabled', title: '是否禁用', align: 'center'}
                 , {title: '操作', width: 300, align: 'center', toolbar: '#optBar'}
             ]],
@@ -44,20 +42,23 @@ $(function () {
 
 
         //监听工具条
-        table.on('tool(forwardTable)', function (obj) {
+        table.on('tool(clashTable)', function (obj) {
             var data = obj.data;
-            if (obj.event === 'start') {
+            if (obj.event === 'delete') {
                 //启动
-                startForward(data, "启动中转");
-            } else if (obj.event === 'stop') {
+                delClash (data, data.id, data.configName);
+            } else if (obj.event === 'edit') {
                 //编辑
-                stopForward(data, "编辑");
+                openCLash(data, "编辑配置");
+            } else if (obj.event === 'copyLink') {
+                //编辑
+                copyLink(data);
             }
         });
 
         //监听提交
-        form.on('submit(portForwardSubmit)', function (data) {
-            startPortForwardSubmit(data);
+        form.on('submit(clashSubmit)', function (data) {
+            clashSubmit(data);
             return false;
         });
 
@@ -66,14 +67,15 @@ $(function () {
 });
 
 //提交表单
-function startPortForwardSubmit(obj) {
+function clashSubmit(data) {
     $.ajax({
         type: "POST",
-        data: $("#startForwardForm").serialize(),
-        url: "/startForward",
+        data: JSON.stringify(data.field),
+        contentType: "application/json",
+        url: "/saveClash",
         success: function (data) {
             if (data.code === "0") {
-                layer.alert("启动成功", function () {
+                layer.alert("保存成功", function () {
                     layer.closeAll();
                     load();
                 });
@@ -91,18 +93,54 @@ function startPortForwardSubmit(obj) {
     });
 }
 
-function startForward(data, title) {
-    $("#localPort").val(data.localPort);
-    $("#remoteHost").val(data.remoteHost);
-    $("#remotePort").val(data.remotePort);
+//开通用户
+function addClash() {
+    openCLash(null, "添加配置");
+}
+
+function copyLink(data) {
+  let link = window.location.host+'/clash/'+data.id;
+    layer.alert(link);
+}
+
+function delClash(obj, id, name) {
+    if (null != id) {
+        layer.confirm('您确定要删除' + name + '配置吗？', {
+            btn: ['确认', '返回'] //按钮
+        }, function () {
+            $.post("/deleteClash", {"id": id}, function (data) {
+                if (data.code === "0") {
+                    layer.alert("删除成功", function () {
+                        layer.closeAll();
+                        load(obj);
+                    });
+                } else {
+                    layer.alert(data.msg);
+                }
+            });
+        }, function () {
+            layer.closeAll();
+        });
+    }
+}
+
+function openCLash(data, title) {
+    if (data == null || data == "") {
+        $("#id").val("");
+    } else {
+        $("#id").val(data.id);
+        $("#configName").val(data.configName);
+        $("#text").val(data.text);
+        $("#expireTime").val(data.expireTime);
+    }
     layer.open({
         type: 1,
         title: title,
         fixed: false,
         resize: false,
         shadeClose: true,
-        area: ['600px'],
-        content: $('#startForward')
+        area: ['800px'],
+        content: $('#clashDialog')
     });
 }
 
