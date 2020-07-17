@@ -26,7 +26,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authInterceptor).excludePathPatterns("/swagger-resources/**", "/*/api-docs/**", "/images/**", "/lib/**", "/h-ui/**", "/h-ui.admin/**", "/**/favicon.ico")
+        registry.addInterceptor(authInterceptor).excludePathPatterns("/clash/**","/swagger-resources/**", "/*/api-docs/**", "/images/**", "/lib/**", "/h-ui/**", "/h-ui.admin/**", "/**/favicon.ico")
                 .excludePathPatterns("/**/*.woff2", "/**/*.css", "/**/*.html", "/**/*.js", "/**/*.png", "/**/*.gif", "/**/*.jpg", "/**/*.jpeg", "/h2/**", "/login", "/error");
     }
 

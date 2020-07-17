@@ -99,7 +99,14 @@ function addClash() {
 }
 
 function copyLink(data) {
-  let link = window.location.host+'/clash/'+data.id;
+  const curUrl = window.location.href;
+  let prefix = ""
+  if(curUrl.indexOf("https")>=0){
+      prefix = "https://"
+  }else{
+      prefix = "http://"
+  }
+  let link = prefix+ window.location.host+'/clash/'+data.id;
     layer.alert(link);
 }
 

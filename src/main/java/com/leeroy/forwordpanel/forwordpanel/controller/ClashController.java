@@ -52,13 +52,13 @@ public class ClashController {
     @GetMapping("clash/{id}")
     public void getClashFileById(@PathVariable String id, HttpServletResponse response) {
         Clash clash = clashService.findClashById(id);
-        String text = clash.getText();
-        byte[] bytes = text.getBytes();
-        response.setContentType("application/octet-stream;charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + id + ".yml\"");
-        response.addHeader("Content-Length", "" + bytes.length);
-        OutputStream stream = null;
         try {
+            String text = clash.getText();
+            byte[] bytes = text.getBytes("UTF-8");
+            response.setContentType("application/octet-stream;charset=UTF-8");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + id + ".yml\"");
+            response.addHeader("Content-Length", "" + bytes.length);
+            OutputStream stream = null;
             stream = response.getOutputStream();
             stream.write(bytes);
             stream.flush();
