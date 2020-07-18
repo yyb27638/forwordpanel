@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,11 +43,23 @@ public class UserPortForwardService {
      */
     public ApiResponse<List<UserPortForward>> getUserForwardList() {
         Integer userId = WebCurrentData.getUserId();
-        LambdaQueryWrapper<UserPortForward> queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userId)
-                .eq(UserPortForward::getDeleted, false);
+        LambdaQueryWrapper<UserPortForward> queryWrapper;
+        if(WebCurrentData.getUser().getUserType()==0){
+            queryWrapper  = Wrappers.<UserPortForward>lambdaQuery()
+                    .eq(UserPortForward::getDeleted, false);
+        }else{
+            queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userId)
+                    .eq(UserPortForward::getDeleted, false);
+        }
         List<UserPortForward> userPortForwardList = userPortForwardDao.selectList(queryWrapper);
+        for (UserPortForward userPortForward : userPortForwardList) {
+            String flow = forwardService.getPortFlow(userPortForward.getRemoteIp(), userPortForward.getRemotePort());
+            userPortForward.setDataUsage(Long.valueOf(flow));
+        }
         return ApiResponse.ok(userPortForwardList);
     }
+
+
 
     /**
      * 创建端口转发
@@ -63,7 +76,7 @@ public class UserPortForwardService {
             userPortForward.setLocalPort(localPort);
             userPortForward.setUserId(userId);
             userPortForward.setDeleted(false);
-            userPortForward.setCreateTime(System.currentTimeMillis());
+            userPortForward.setCreateTime(new Date());
             userPortForward.setDisabled(true);
             userPortForwardDao.insert(userPortForward);
         }
@@ -135,7 +148,7 @@ public class UserPortForwardService {
         //开始新的中转
         forwardService.addForward(userPortForward.getRemoteIp(), userPortForward.getRemotePort(), userPortForward.getLocalPort());
         //更新中转信息
-        portForward.setUpdateTime(System.currentTimeMillis());
+        portForward.setUpdateTime(new Date());
         portForward.setRemoteIp(userPortForward.getRemoteIp());
         portForward.setRemoteHost(userPortForward.getRemoteHost());
         portForward.setRemotePort(userPortForward.getRemotePort());

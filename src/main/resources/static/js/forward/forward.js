@@ -24,6 +24,7 @@ $(function () {
                 , {field: 'remoteIp', title: '中转IP', align: 'center'}
                 , {field: 'remotePort', title: '中转端口', align: 'center'}
                 , {field: 'disabled', title: '是否禁用', align: 'center'}
+                , {field: 'dataUsage', title: '流量', align: 'center'}
                 , {title: '操作', width: 300, align: 'center', toolbar: '#optBar'}
             ]],
             done: function (res, curr, count) {
@@ -38,6 +39,14 @@ $(function () {
                     } else if ($(this).text() == false) {
                         $(this).text("启用")
                     }
+                });
+                let row = 0
+                $("[data-field='dataUsage']").children().each(function () {
+                    if(row > 0){
+                        let usage = $(this).text();
+                        $(this).text(formatBytes(parseInt(usage, 10)))
+                    }
+                    row++
                 });
             }
         });
@@ -105,6 +114,20 @@ function startForward(data, title) {
         content: $('#startForward')
     });
 }
+
+
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
 
 function stopForward(data) {
     console.log(data)

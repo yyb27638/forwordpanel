@@ -4,9 +4,9 @@ CREATE TABLE sys_user  (
   password varchar(250) DEFAULT NULL ,
   user_phone varchar(11) ,
   telegram varchar(11) ,
-  reg_time BIGINT ,
+  reg_time DATE ,
   data_limit BIGINT,
-  expire_time BIGINT,
+  expire_time DATE,
   data_usage BIGINT,
   user_type INTEGER NOT NULL DEFAULT 1,
   disabled BOOLEAN ,
@@ -23,9 +23,9 @@ CREATE TABLE user_port  (
   data_usage BIGINT,
   disabled BOOLEAN ,
   deleted BOOLEAN ,
-  expire_time BIGINT,
-  create_time BIGINT ,
-  update_time BIGINT
+  expire_time DATE,
+  create_time DATE ,
+  update_time DATE
 );
 
 
@@ -50,8 +50,8 @@ CREATE TABLE user_port_forward  (
   data_usage BIGINT,
   disabled BOOLEAN ,
   deleted BOOLEAN ,
-  create_time BIGINT ,
-  update_time BIGINT
+  create_time DATE ,
+  update_time DATE
 );
 
 CREATE TABLE clash  (
@@ -61,7 +61,7 @@ CREATE TABLE clash  (
   user_id int NOT NULL ,
   disabled BOOLEAN ,
   deleted BOOLEAN ,
-  expire_time BIGINT,
-  create_time BIGINT ,
-  update_time BIGINT
+  expire_time DATE,
+  create_time DATE ,
+  update_time DATE
 );

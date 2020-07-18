@@ -3,9 +3,12 @@ package com.leeroy.forwordpanel.forwordpanel.service;
 import com.alibaba.fastjson.JSON;
 import com.leeroy.forwordpanel.forwordpanel.common.util.IpUtil;
 import com.leeroy.forwordpanel.forwordpanel.common.util.ShellUtil;
+import com.leeroy.forwordpanel.forwordpanel.dto.DataFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
 
 @Slf4j
 @Service
@@ -25,11 +28,10 @@ public class ForwardService {
         ShellUtil.execShell(String.format("iptables -t nat -A PREROUTING -p udp --dport %d -j DNAT --to-destination %s:%d", localPort, remoteHost, remotePort));
         ShellUtil.execShell(String.format("iptables -t nat -A POSTROUTING -p tcp -d %s --dport %d -j SNAT --to-source %s", remoteHost, remotePort, localIp));
         ShellUtil.execShell(String.format("iptables -t nat -A POSTROUTING -p udp -d %s --dport %d -j SNAT --to-source %s", remoteHost, remotePort, localIp));
-        String flow = ShellUtil.execShell(String.format("iptables -L -v -n -x | grep %s |grep %s | awk '{print $2}'", remoteHost, remotePort));
+        String flow = ShellUtil.execShell(String.format("iptables -n -v -L -t filter -x | grep %s | awk '{print $2}'", remoteHost));
         log.info("fow: {}", flow);
         if (StringUtils.isEmpty(flow)) {
-            ShellUtil.execShell(String.format("iptables -A FORWARD -p tcp --dport %s -d %s", remotePort, remoteHost));
-            ShellUtil.execShell(String.format("iptables -A FORWARD -p udp --dport %s -d %s", remotePort, remoteHost));
+            ShellUtil.execShell(String.format("iptables -I FORWARD -s %s", remoteHost));
         }
     }
 
@@ -41,7 +43,10 @@ public class ForwardService {
      * @return
      */
     public String getPortFlow(String remoteHost, Integer remotePort) {
-        return ShellUtil.execShell(String.format("iptables -L -v -n -x | grep %s |grep %s | awk '{print $2}'", remoteHost, remotePort));
+        String result = ShellUtil.execShell(String.format("iptables -n -v -L -t filter -x | grep %s | awk '{print $2}'", remoteHost));
+        result = result.replaceAll("\n", "");
+        log.info("flow:{}", result);
+        return StringUtils.isEmpty(result)?"0":result;
     }
 
 
@@ -54,7 +59,6 @@ public class ForwardService {
         ShellUtil.execShell(String.format("iptables -Z FORWARD -p tcp --dport %s -d %s",  remotePort, remoteHost));
         ShellUtil.execShell(String.format("iptables -Z FORWARD -p udp --dport %s -d %s",  remotePort, remoteHost));
     }
-
 
     /**
      * 重置流量

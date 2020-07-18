@@ -10,6 +10,7 @@ import com.leeroy.forwordpanel.forwordpanel.model.UserPortForward;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -32,10 +33,10 @@ public class UserPortService {
             }
             userPort.setDeleted(false);
             userPort.setDisabled(false);
-            userPort.setCreateTime(System.currentTimeMillis());
+            userPort.setCreateTime(new Date());
             userPortDao.insert(userPort);
         } else {
-            userPort.setUpdateTime(System.currentTimeMillis());
+            userPort.setUpdateTime(new Date());
             userPortDao.updateById(userPort);
         }
         //创建中转记录

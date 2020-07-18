@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class UserService {
                 String password = DigestUtils.Md5(username, user.getPassword());
                 user.setPassword(password);
             }
-            user.setRegTime(System.currentTimeMillis());
+            user.setRegTime(new Date());
             user.setDisabled(false);
             user.setDeleted(false);
             userDao.insert(user);
@@ -104,11 +105,13 @@ public class UserService {
             return ApiResponse.error("400", "用户名已存在");
         }
         String username = user.getUsername();
-        if (user.getPassword() != null) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(user.getPassword())) {
             String password = DigestUtils.Md5(username, user.getPassword());
             user.setPassword(password);
+        }else {
+            user.setPassword(null);
         }
-        userDao.insert(user);
+        userDao.updateById(user);
         return ApiResponse.ok();
     }
 

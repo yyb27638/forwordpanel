@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,12 +29,12 @@ public class ClashService {
         if (StringUtils.isEmpty(clash.getId())) {
             clash.setDeleted(false);
             clash.setDisabled(false);
-            clash.setCreateTime(System.currentTimeMillis());
+            clash.setCreateTime(new Date());
             clashDao.insert(clash);
         } else {
             Clash existClash = clashDao.selectById(clash.getId());
             BeanUtils.copyProperties(clash, existClash);
-            existClash.setUpdateTime(System.currentTimeMillis());
+            existClash.setUpdateTime(new Date());
             clashDao.updateById(existClash);
         }
         return ApiResponse.ok();

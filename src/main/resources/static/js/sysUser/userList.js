@@ -4,9 +4,10 @@
 var pageCurr;
 var form;
 $(function () {
-    layui.use('table', function () {
+    layui.use(['table','laydate'], function () {
         var table = layui.table;
         form = layui.form;
+        laydate = layui.laydate;
         tableIns = table.render({
             elem: '#uesrList',
             url: '/user/getUserList',
@@ -30,6 +31,7 @@ $(function () {
                 , {field: 'telegram', title: 'TG', align: 'center'}
                 , {field: 'dataLimit', title: '流量限制', align: 'center'}
                 , {field: 'regTime', title: '注册时间', align: 'center'}
+                , {field: 'expireTime', title: '到期时间', align: 'center'}
                 , {field: 'disabled', title: '是否禁用', align: 'center'}
                 , {title: '操作', width:300,  align: 'center', toolbar: '#optBar'}
             ]],
@@ -130,25 +132,6 @@ $(function () {
 
     });
 
-    //搜索框
-    layui.use(['form', 'laydate'], function () {
-        var form = layui.form, layer = layui.layer
-            , laydate = layui.laydate;
-        //日期
-        laydate.render({
-            elem: '#startTime'
-        });
-        laydate.render({
-            elem: '#endTime'
-        });
-        //TODO 数据校验
-        //监听搜索框
-        form.on('submit(searchSubmit)', function (data) {
-            //重新加载table
-            load(data);
-            return false;
-        });
-    });
 });
 
 //提交表单
@@ -213,6 +196,7 @@ function openUser(data, title) {
     } else {
         $("#id").val(data.id);
         $("#addUsername").val(data.username);
+        $("#expireTime").val(data.expireTime);
         $("#mobile").val(data.userPhone);
         $("#addTelegram").val(data.telegram);
         $("#addDataLimit").val(data.dataLimit);
@@ -229,6 +213,12 @@ function openUser(data, title) {
         shadeClose: true,
         area: ['600px'],
         content: $('#setUser'),
+        success: function () {
+            laydate.render({
+                elem: "#expireTime",
+                type: "date"
+            })
+        },
         end: function () {
             cleanUser();
         }
