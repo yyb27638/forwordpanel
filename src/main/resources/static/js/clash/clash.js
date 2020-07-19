@@ -4,8 +4,9 @@
 var pageCurr;
 var form;
 $(function () {
-    layui.use('table', function () {
+    layui.use(['table','laydate'], function () {
         var table = layui.table;
+        laydate = layui.laydate;
         form = layui.form;
         tableIns = table.render({
             elem: '#clashList',
@@ -147,7 +148,13 @@ function openCLash(data, title) {
         resize: false,
         shadeClose: true,
         area: ['800px'],
-        content: $('#clashDialog')
+        content: $('#clashDialog'),
+        success: function () {
+            laydate.render({
+                elem: "#expireTime",
+                type: "date"
+            })
+        },
     });
 }
 

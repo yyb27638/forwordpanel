@@ -13,7 +13,7 @@ CREATE TABLE sys_user  (
   deleted BOOLEAN
 );
 
-INSERT INTO sys_user VALUES (1, 'admin', 'a66abb5684c45962d887564f08346e8d', '11111111111','leeroy',1594463119000, 107374182400,null,null, 0, false, false);
+INSERT INTO sys_user VALUES (1, 'admin', '028974a1894e75000bf41636adc8ed81', '11111111111','leeroy','2020-01-03', 107374182400,null,null, 0, false, false);
 
 CREATE TABLE user_port  (
   id int NOT NULL AUTO_INCREMENT ,

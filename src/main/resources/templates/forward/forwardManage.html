@@ -9,7 +9,9 @@
     <div th:replace="fragments/head :: header"></div>
 
     <div class="layui-body" style="margin: 1%">
-
+        <div th:if="${expireTime != null}">
+        账户有效期至: <span th:text="${expireTime}"></span>
+        </div>
         <!--<hr class="layui-bg-blue"/>-->
         <table id="forwardList" lay-filter="forwardTable"></table>
 
@@ -34,14 +36,14 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">中转域名(IP)</label>
+                <label class="layui-form-label">域名(IP)</label>
                 <div class="layui-input-inline">
                     <input id="remoteHost" name="remoteHost" lay-verify="required" autocomplete="off"
                            class="layui-input" type="text"/>
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">中转端口</label>
+                <label class="layui-form-label">端口</label>
                 <div class="layui-input-inline">
                     <input id="remotePort" name="remotePort" lay-verify="required|number" autocomplete="off"
                            onkeyup="this.value=this.value.replace(/\D/g,'')"

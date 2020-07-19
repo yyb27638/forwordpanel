@@ -89,6 +89,21 @@ public class UserService {
     }
 
     /**
+     * 增加流量
+     */
+    public void incrementData(String dataCountStr, Integer userId){
+        Long dataCount = null;
+        if(org.apache.commons.lang3.StringUtils.isEmpty(dataCountStr)){
+            dataCount = 0L;
+        }else {
+            dataCount = Long.valueOf(dataCountStr);
+        }
+        User user = new User();
+        user.setId(userId);
+        user.setDataUsage(user.getDataUsage()+dataCount);
+        userDao.updateById(user);
+    }
+    /**
      * 更新用户
      *
      * @param user

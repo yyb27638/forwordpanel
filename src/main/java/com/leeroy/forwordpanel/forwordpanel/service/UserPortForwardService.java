@@ -145,6 +145,7 @@ public class UserPortForwardService {
             forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), portForward.getLocalPort());
         }
         userPortForward.setRemoteIp(getRemoteIp(userPortForward.getRemoteHost()));
+
         //开始新的中转
         forwardService.addForward(userPortForward.getRemoteIp(), userPortForward.getRemotePort(), userPortForward.getLocalPort());
         //更新中转信息

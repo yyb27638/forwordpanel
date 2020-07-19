@@ -19,10 +19,18 @@ $(function () {
             },
             cols: [[
                 {type: 'numbers'}
-                , {field: 'localPort', title: '本地端口', align: 'center'}
-                , {field: 'remoteHost', title: '中转域名(IP)', align: 'center'}
-                , {field: 'remoteIp', title: '中转IP', align: 'center'}
-                , {field: 'remotePort', title: '中转端口', align: 'center'}
+                , {field: 'localPort', title: '中转IP', align: 'center', templet: function(d){
+                        var host = window.location.host;
+                        if(host.indexOf(':')>0){
+                            return host.split(':')[0]
+                        }else {
+                            return host
+                        }
+                    }}
+                , {field: 'localPort', title: '中转端口', align: 'center'}
+                , {field: 'remoteHost', title: '被中转域名(IP)', align: 'center'}
+                , {field: 'remoteIp', title: '被中转IP', align: 'center'}
+                , {field: 'remotePort', title: '被中转端口', align: 'center'}
                 , {field: 'disabled', title: '是否禁用', align: 'center'}
                 , {field: 'dataUsage', title: '流量', align: 'center'}
                 , {title: '操作', width: 300, align: 'center', toolbar: '#optBar'}
