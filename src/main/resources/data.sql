@@ -83,3 +83,4 @@ alter table user_port add local_port int default NULL;
 
 alter table user_port_forward drop local_port;
 alter table user_port_forward add local_port int default NULL;
+alter table user_port_forward add port_id int NOT NULL;
