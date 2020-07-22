@@ -42,9 +42,9 @@ $(function () {
                 //得到当前页码
 
                 $("[data-field='disabled']").children().each(function () {
-                    if ($(this).text() === true) {
-                        $(this).text("禁用")
-                    } else if ($(this).text() === false) {
+                    if ($(this).text() === "true") {
+                        $(this).text("停用")
+                    } else if ($(this).text()=== "false") {
                         $(this).text("启用")
                     }
                 });

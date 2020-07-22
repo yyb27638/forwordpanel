@@ -175,6 +175,18 @@ public class UserService {
         return ApiResponse.ok();
     }
 
+
+    /**
+     * 禁用用户
+     *
+     * @param id
+     * @return
+     */
+    public ApiResponse disableUserById(Integer id) {
+        userDao.updateDisable(true, id);
+        return ApiResponse.ok();
+    }
+
     /**
      * 启用用户
      *

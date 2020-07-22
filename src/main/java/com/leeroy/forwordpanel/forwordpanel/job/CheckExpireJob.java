@@ -25,7 +25,7 @@ public class CheckExpireJob {
     @Autowired
     private UserPortService userPortService;
 
-    @Scheduled(cron = "0 0/3 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     public void execute() {
         List<User> expireUserList = userService.findExpireUserList();
         for (User user : expireUserList) {
@@ -33,7 +33,7 @@ public class CheckExpireJob {
                 continue;
             }
             userPortService.disableUserPort(user.getId());
-            userService.disableUser(user.getId());
+            userService.disableUserById(user.getId());
         }
     }
 }

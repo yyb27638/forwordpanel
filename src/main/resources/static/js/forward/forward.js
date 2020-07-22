@@ -42,11 +42,11 @@ $(function () {
                 //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
                 //console.log(res);
                 //得到当前页码
-                console.log(curr);
+
                 $("[data-field='disabled']").children().each(function () {
-                    if ($(this).text() == true) {
+                    if ($(this).text() === "true") {
                         $(this).text("停用")
-                    } else if ($(this).text() == false) {
+                    } else if ($(this).text()=== "false") {
                         $(this).text("启用")
                     }
                 });
