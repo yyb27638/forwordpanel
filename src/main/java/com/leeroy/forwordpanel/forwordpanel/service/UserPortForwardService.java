@@ -42,7 +42,7 @@ public class UserPortForwardService {
     private PortDao portDao;
 
     @Autowired
-    private ForwardService forwardService;
+    private RemoteForwardService forwardService;
 
     /**
      * 查询用户中转
@@ -157,7 +157,11 @@ public class UserPortForwardService {
             Port port = portDao.selectById(portForward.getPortId());
             forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
         }
-        userPortForward.setRemoteIp(getRemoteIp(userPortForward.getRemoteHost()));
+        String remoteIp = getRemoteIp(userPortForward.getRemoteHost());
+        if(StringUtils.isBlank(remoteIp)){
+            return ApiResponse.error("401", "域名解析错误");
+        }
+        userPortForward.setRemoteIp(remoteIp);
 
         Port port = portDao.selectById(userPortForward.getPortId());
         //开始新的中转
