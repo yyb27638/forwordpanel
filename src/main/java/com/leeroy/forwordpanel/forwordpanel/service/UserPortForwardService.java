@@ -7,6 +7,7 @@ import com.leeroy.forwordpanel.forwordpanel.common.WebCurrentData;
 import com.leeroy.forwordpanel.forwordpanel.common.response.ApiResponse;
 import com.leeroy.forwordpanel.forwordpanel.common.util.BeanCopyUtil;
 import com.leeroy.forwordpanel.forwordpanel.dao.PortDao;
+import com.leeroy.forwordpanel.forwordpanel.dao.UserDao;
 import com.leeroy.forwordpanel.forwordpanel.dao.UserPortDao;
 import com.leeroy.forwordpanel.forwordpanel.dao.UserPortForwardDao;
 import com.leeroy.forwordpanel.forwordpanel.dto.UserPortForwardDTO;
@@ -42,6 +43,9 @@ public class UserPortForwardService {
     private PortDao portDao;
 
     @Autowired
+    private UserDao userDao;
+
+    @Autowired
     private RemoteForwardService forwardService;
 
     /**
@@ -65,7 +69,13 @@ public class UserPortForwardService {
             String flow = forwardService.getPortFlow(userPortForward.getRemoteIp(), userPortForward.getRemotePort());
             userPortForward.setDataUsage(Long.valueOf(flow));
             Port port = portDao.selectById(userPortForward.getPortId());
-            userPortForward.setLocalPort(port.getLocalPort());
+            if(port!=null){
+                userPortForward.setLocalPort(port.getLocalPort());
+            }
+            User user = userDao.selectById(userPortForward.getUserId());
+            if(user!=null){
+                userPortForward.setUsername(user.getUsername());
+            }
             userPortForward.setInternetPort(port.getInternetPort());
         }
         return ApiResponse.ok(userPortForwardDTOList);

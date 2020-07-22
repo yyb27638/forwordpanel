@@ -34,6 +34,7 @@ $(function () {
                 , {field: 'remotePort', title: '被中转端口', align: 'center'}
                 , {field: 'disabled', title: '是否禁用', align: 'center'}
                 , {field: 'dataUsage', title: '流量', align: 'center'}
+                , {field: 'username', title: '用户名', align: 'center'}
                 , {title: '操作', width: 300, align: 'center', toolbar: '#optBar'}
             ]],
             done: function (res, curr, count) {

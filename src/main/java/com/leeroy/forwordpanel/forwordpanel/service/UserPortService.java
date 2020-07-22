@@ -103,15 +103,34 @@ public class UserPortService {
      * @return
      */
     public ApiResponse disablePort(Integer id) {
-        if (id.equals(WebCurrentData.getUserId())) {
-            return ApiResponse.error("400", "您不能禁用自己");
-        }
         UserPort existPort = userPortDao.selectById(id);
         UserPortForward userPortForward = new UserPortForward();
         userPortForward.setPortId(existPort.getPortId());
         userPortForward.setUserId(existPort.getUserId());
         userPortForwardService.stopForward(userPortForward);
         userPortDao.updateDisable(true, id);
+        return ApiResponse.ok();
+    }
+
+
+    /**
+     * 禁用用户所有端口
+     *
+     * @param userId
+     * @return
+     */
+    public ApiResponse disableUserPort(Integer userId) {
+        LambdaQueryWrapper<UserPort> queryWrapper = Wrappers.<UserPort>lambdaQuery().eq(UserPort::getUserId, userId)
+                .eq(UserPort::getDeleted, false);
+        List<UserPort> userPorts = userPortDao.selectList(queryWrapper);
+        for (UserPort userPort : userPorts) {
+            UserPort existPort = userPortDao.selectById(userPort.getId());
+            UserPortForward userPortForward = new UserPortForward();
+            userPortForward.setPortId(existPort.getPortId());
+            userPortForward.setUserId(existPort.getUserId());
+            userPortForwardService.stopForward(userPortForward);
+            userPortDao.updateDisable(true, userPort.getId());
+        }
         return ApiResponse.ok();
     }
 
@@ -122,9 +141,6 @@ public class UserPortService {
      * @return
      */
     public ApiResponse enablePort(Integer id) {
-        if (id.equals(WebCurrentData.getUserId())) {
-            return ApiResponse.error("400", "您不能启用自己");
-        }
         userPortDao.updateDisable(false, id);
         return ApiResponse.ok();
     }

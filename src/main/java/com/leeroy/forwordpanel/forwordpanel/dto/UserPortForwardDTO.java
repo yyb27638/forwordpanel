@@ -22,6 +22,7 @@ public class UserPortForwardDTO {
     private Integer portId;
     private Integer localPort;
     private Integer internetPort;
+    private String username;
     // 目标ip
     private String remoteIp;
     // 目标主机地址

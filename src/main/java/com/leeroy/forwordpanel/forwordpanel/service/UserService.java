@@ -213,4 +213,11 @@ public class UserService {
         password = DigestUtils.Md5(userName, password);
         userDao.updatePwd(userName, password);
     }
+
+
+    public List<User> findExpireUserList(){
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>lambdaQuery().lt(User::getExpireTime, new Date())
+                .eq(User::getDeleted, false).eq(User::getDisabled, false);
+        return userDao.selectList(queryWrapper);
+    }
 }
