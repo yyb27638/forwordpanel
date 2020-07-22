@@ -60,7 +60,7 @@ $(function () {
                 });
                 var that = this.elem.next();
                 res.data.forEach(function (item, index) {
-                    if (item.disabled) {
+                    if (!item.disabled) {
                         var tr = that.find(".layui-table-box tbody tr[data-index='" + index + "']");
                         tr.css("background-color", "#f0f9eb");
 
