@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head th:include="layout :: htmlhead" th:with="title='端口管理'">
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <!--头-->
+    <div th:replace="fragments/head :: header"></div>
+
+    <div class="layui-body" style="margin: 1%">
+
+        <button class="layui-btn layui-btn-normal" onclick="add()">添加端口</button>
+        <!--<hr class="layui-bg-blue"/>-->
+        <table id="portList" lay-filter="portTable"></table>
+
+        <script type="text/html" id="optBar">
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+        </script>
+    </div>
+
+    <!--添加端口-->
+    <div id="portDialog" class="layer_self_wrap" style="padding:20px; display:none;">
+        <form id="portForm" class="layui-form" method="post" action="" style="padding:20px;">
+            <input id="id" type="hidden" name="id"/>
+            <div class="layui-form-item">
+                <label class="layui-form-label">本地端口:</label>
+                <div class="layui-input-block">
+                    <input id="localPort" name="localPort" required lay-verify="required"  onkeyup="this.value=this.value.replace(/\D/g,'')"
+                           onafterpaste="this.value=this.value.replace(/\D/g,'')" placeholder="请输入" type="text" class="layui-input"></input>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">外网端口:</label>
+                <div class="layui-input-block">
+                    <input id="internetPort" name="internetPort"  onkeyup="this.value=this.value.replace(/\D/g,'')"
+                           onafterpaste="this.value=this.value.replace(/\D/g,'')" required lay-verify="required" placeholder="请输入" type="text" class="layui-input"></input>
+                </div>
+            </div>
+            <button class="layui-btn" lay-submit="" lay-filter="portSubmit">保存</button>
+        </form>
+    </div>
+
+    <!--底部-->
+    <div th:replace="fragments/footer :: footer"></div>
+    <script src="/js/port/port.js"></script>
+
+</div>
+<style type="text/css">
+    .layui-form-pane .layui-form-label{
+        width: 120px;
+    }
+</style>
+</body>
+</html>

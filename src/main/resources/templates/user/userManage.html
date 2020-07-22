@@ -109,8 +109,9 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">端口</label>
                 <div class="layui-input-inline">
-                    <input id="localPort" name="localPort" lay-verify="required|number" autocomplete="off"
-                           class="layui-input" type="text"/>
+                    <select name="localPort" id="localPort" lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
                 </div>
             </div>
             <div class="layui-form-item">

@@ -259,6 +259,9 @@ function addUserPort(data) {
         shadeClose: true,
         area: ['600px'],
         content: $('#setUserPort'),
+        success: function(){
+            getFreePortList();
+        },
         end: function () {
             cleanUser();
         }
@@ -396,6 +399,23 @@ function load(obj) {
     });
 }
 
+function getFreePortList(){
+    $.get("/port/getFreePortList", function (data) {
+        if (data.code === "0") {
+            $("#localPort").empty();
+            layui.form.render("select");
+            $.each(data.data, function(index, item) {
+                $('#localPort')
+                    .append(new Option(item.internetPort, item.internetPort));
+            });
+            layui.form.render("select");
+        } else {
+            layer.alert(data.msg);
+        }
+    });
+
+}
+
 function loadUserPort(id) {
     //重新加载table
     userPortList.reload({
@@ -406,6 +426,7 @@ function loadUserPort(id) {
 function cleanUser() {
     $("#username").val("");
     $("#mobile").val("");
+    $("#id").val("");
     $("#password").val("");
     $('#roleId').html("");
     $('#telegram').html("");

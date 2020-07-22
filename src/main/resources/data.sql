@@ -65,3 +65,12 @@ CREATE TABLE clash  (
   create_time DATE ,
   update_time DATE
 );
+
+CREATE TABLE port  (
+  id varchar(50) NOT NULL AUTO_INCREMENT,
+  local_port int NOT NULL ,
+  internet_port int NOT NULL ,
+  deleted BOOLEAN,
+  create_time DATE,
+  update_time DATE
+);

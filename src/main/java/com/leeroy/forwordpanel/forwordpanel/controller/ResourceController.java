@@ -27,9 +27,11 @@ public class ResourceController {
         List<Resource> adminResourceList = new ArrayList<>();
         Resource systemManage = new Resource(1, "系统管理", "");
         List<Resource> systemManageChildList = new ArrayList<>();
+        systemManageChildList.add(new Resource(3, "端口管理", "/port/manage"));
         systemManageChildList.add(new Resource(1, "账号管理", "/user/userManage"));
         systemManageChildList.add(new Resource(2, "中转管理", "/portForwardManage"));
         systemManageChildList.add(new Resource(3, "Clash配置", "/clashManage"));
+
         systemManage.setChildrens(systemManageChildList);
         adminResourceList.add(systemManage);
         USER_TYPE_RESOURCE.put(0, adminResourceList);
