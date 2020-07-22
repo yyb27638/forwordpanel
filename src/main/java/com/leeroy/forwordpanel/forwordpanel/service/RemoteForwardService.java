@@ -51,6 +51,9 @@ public class RemoteForwardService {
      * @return
      */
     public String getPortFlow(String remoteHost, Integer remotePort) {
+        if(StringUtils.isEmpty(remoteHost)){
+            return "0";
+        }
         sshExecutor.execute(String.format("iptables -n -v -L -t filter -x | grep %s | awk '{print $2}'", remoteHost));
         String result = sshExecutor.getResult();
         result = result.replaceAll("\n", "");
