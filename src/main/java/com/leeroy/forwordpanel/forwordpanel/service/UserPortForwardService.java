@@ -202,7 +202,7 @@ public class UserPortForwardService {
         if (!apiResponse.getSuccess()) {
             return apiResponse;
         }
-        LambdaQueryWrapper<UserPortForward> queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userId)
+        LambdaQueryWrapper<UserPortForward> queryWrapper = Wrappers.<UserPortForward>lambdaQuery()
                 .eq(UserPortForward::getPortId, userPortForward.getPortId()).eq(UserPortForward::getDeleted, false);
         UserPortForward portForward = userPortForwardDao.selectOne(queryWrapper);
         if (!portForward.getDisabled()) {
