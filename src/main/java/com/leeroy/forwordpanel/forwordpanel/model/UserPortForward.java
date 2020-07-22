@@ -18,8 +18,8 @@ public class UserPortForward {
     private Integer id;
     // 中转用户
     private Integer userId;
-    // 监听本地端口
-    private Integer localPort;
+    //端口id
+    private Integer portId;
     // 目标ip
     private String remoteIp;
     // 目标主机地址

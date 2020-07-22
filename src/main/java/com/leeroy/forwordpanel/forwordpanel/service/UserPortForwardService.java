@@ -5,8 +5,13 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.leeroy.forwordpanel.forwordpanel.common.WebCurrentData;
 import com.leeroy.forwordpanel.forwordpanel.common.response.ApiResponse;
+import com.leeroy.forwordpanel.forwordpanel.common.util.BeanCopyUtil;
+import com.leeroy.forwordpanel.forwordpanel.dao.PortDao;
 import com.leeroy.forwordpanel.forwordpanel.dao.UserPortDao;
 import com.leeroy.forwordpanel.forwordpanel.dao.UserPortForwardDao;
+import com.leeroy.forwordpanel.forwordpanel.dto.UserPortDTO;
+import com.leeroy.forwordpanel.forwordpanel.dto.UserPortForwardDTO;
+import com.leeroy.forwordpanel.forwordpanel.model.Port;
 import com.leeroy.forwordpanel.forwordpanel.model.UserPort;
 import com.leeroy.forwordpanel.forwordpanel.model.UserPortForward;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +39,9 @@ public class UserPortForwardService {
     private UserPortDao userPortDao;
 
     @Autowired
+    private PortDao portDao;
+
+    @Autowired
     private ForwardService forwardService;
 
     /**
@@ -41,39 +49,42 @@ public class UserPortForwardService {
      *
      * @return
      */
-    public ApiResponse<List<UserPortForward>> getUserForwardList() {
+    public ApiResponse<List<UserPortForwardDTO>> getUserForwardList() {
         Integer userId = WebCurrentData.getUserId();
         LambdaQueryWrapper<UserPortForward> queryWrapper;
-        if(WebCurrentData.getUser().getUserType()==0){
-            queryWrapper  = Wrappers.<UserPortForward>lambdaQuery()
+        if (WebCurrentData.getUser().getUserType() == 0) {
+            queryWrapper = Wrappers.<UserPortForward>lambdaQuery()
                     .eq(UserPortForward::getDeleted, false);
-        }else{
+        } else {
             queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userId)
                     .eq(UserPortForward::getDeleted, false);
         }
         List<UserPortForward> userPortForwardList = userPortForwardDao.selectList(queryWrapper);
-        for (UserPortForward userPortForward : userPortForwardList) {
+        List<UserPortForwardDTO> userPortForwardDTOList = BeanCopyUtil.copyListProperties(userPortForwardList, UserPortForwardDTO::new);
+        for (UserPortForwardDTO userPortForward : userPortForwardDTOList) {
             String flow = forwardService.getPortFlow(userPortForward.getRemoteIp(), userPortForward.getRemotePort());
             userPortForward.setDataUsage(Long.valueOf(flow));
+            Port port = portDao.selectById(userPortForward.getPortId());
+            userPortForward.setLocalPort(port.getLocalPort());
+            userPortForward.setInternetPort(port.getInternetPort());
         }
-        return ApiResponse.ok(userPortForwardList);
+        return ApiResponse.ok(userPortForwardDTOList);
     }
-
 
 
     /**
      * 创建端口转发
      *
-     * @param localPort
+     * @param portId
      * @param userId
      */
-    public void createUserPortForward(Integer localPort, Integer userId) {
+    public void createUserPortForward(Integer portId, Integer userId) {
         LambdaQueryWrapper<UserPortForward> queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userId)
-                .eq(UserPortForward::getLocalPort, localPort).eq(UserPortForward::getDeleted, false);
+                .eq(UserPortForward::getPortId, portId).eq(UserPortForward::getDeleted, false);
         UserPortForward exist = userPortForwardDao.selectOne(queryWrapper);
         if (exist == null) {
             UserPortForward userPortForward = new UserPortForward();
-            userPortForward.setLocalPort(localPort);
+            userPortForward.setPortId(portId);
             userPortForward.setUserId(userId);
             userPortForward.setDeleted(false);
             userPortForward.setCreateTime(new Date());
@@ -85,20 +96,21 @@ public class UserPortForwardService {
     /**
      * 删除中转
      *
-     * @param localPort
+     * @param portId
      * @param userId
      */
-    public void deleteUserPortForward(Integer localPort, Integer userId) {
+    public void deleteUserPortForward(Integer portId, Integer userId) {
         LambdaQueryWrapper<UserPortForward> queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userId)
-                .eq(UserPortForward::getLocalPort, localPort).eq(UserPortForward::getDeleted, false).eq(UserPortForward::getDisabled, false);
+                .eq(UserPortForward::getPortId, portId).eq(UserPortForward::getDeleted, false).eq(UserPortForward::getDisabled, false);
         UserPortForward portForward = userPortForwardDao.selectOne(queryWrapper);
         if (portForward != null) {
             //停止中转
-            forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), portForward.getLocalPort());
+            Port port = portDao.selectById(portId);
+            forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
         }
         //删除中转记录
         queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userId)
-                .eq(UserPortForward::getLocalPort, localPort);
+                .eq(UserPortForward::getPortId, portId);
         UserPortForward userPortForward = new UserPortForward();
         userPortForward.setDeleted(true);
         userPortForwardDao.update(userPortForward, queryWrapper);
@@ -122,7 +134,7 @@ public class UserPortForwardService {
         List<UserPort> existUserPortList = userPortDao.selectList(userPortQueryWrapper);
         Boolean hasPort = false;
         for (UserPort userPort : existUserPortList) {
-            if (userPort.getLocalPort().equals(userPortForward.getLocalPort())) {
+            if (userPort.getPortId().equals(userPortForward.getPortId())) {
                 if (userPort.getDisabled()) {
                     return ApiResponse.error("403", "端口已被管理员禁用,请联系管理员");
                 }
@@ -138,16 +150,18 @@ public class UserPortForwardService {
         }
         //查询该端口已经存在的转发
         LambdaQueryWrapper<UserPortForward> queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userPortForward.getUserId())
-                .eq(UserPortForward::getLocalPort, userPortForward.getLocalPort()).eq(UserPortForward::getDeleted, false);
+                .eq(UserPortForward::getPortId, userPortForward.getPortId()).eq(UserPortForward::getDeleted, false);
         UserPortForward portForward = userPortForwardDao.selectOne(queryWrapper);
         if (!portForward.getDisabled()) {
             //停止中转
-            forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), portForward.getLocalPort());
+            Port port = portDao.selectById(portForward.getPortId());
+            forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
         }
         userPortForward.setRemoteIp(getRemoteIp(userPortForward.getRemoteHost()));
 
+        Port port = portDao.selectById(userPortForward.getPortId());
         //开始新的中转
-        forwardService.addForward(userPortForward.getRemoteIp(), userPortForward.getRemotePort(), userPortForward.getLocalPort());
+        forwardService.addForward(userPortForward.getRemoteIp(), userPortForward.getRemotePort(), port.getLocalPort());
         //更新中转信息
         portForward.setUpdateTime(new Date());
         portForward.setRemoteIp(userPortForward.getRemoteIp());
@@ -165,17 +179,17 @@ public class UserPortForwardService {
      */
     public ApiResponse stopForward(UserPortForward userPortForward) {
         Integer userId = userPortForward.getUserId();
-        Integer localPort = userPortForward.getLocalPort();
+        Port port = portDao.selectById(userPortForward.getPortId());
         ApiResponse apiResponse = permissionCheck(userId);
         if (!apiResponse.getSuccess()) {
             return apiResponse;
         }
         LambdaQueryWrapper<UserPortForward> queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userId)
-                .eq(UserPortForward::getLocalPort, localPort).eq(UserPortForward::getDeleted, false);
+                .eq(UserPortForward::getPortId, userPortForward.getPortId()).eq(UserPortForward::getDeleted, false);
         UserPortForward portForward = userPortForwardDao.selectOne(queryWrapper);
         if (!portForward.getDisabled()) {
             //停止中转
-            forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), portForward.getLocalPort());
+            forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
         }
         //停止中转记录
         userPortForwardDao.updateDisable(true, portForward.getId());

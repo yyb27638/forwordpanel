@@ -5,6 +5,7 @@ import com.leeroy.forwordpanel.forwordpanel.common.WebCurrentData;
 import com.leeroy.forwordpanel.forwordpanel.common.response.ApiResponse;
 import com.leeroy.forwordpanel.forwordpanel.common.response.PageDataResult;
 import com.leeroy.forwordpanel.forwordpanel.dao.UserPortDao;
+import com.leeroy.forwordpanel.forwordpanel.dto.UserPortDTO;
 import com.leeroy.forwordpanel.forwordpanel.dto.UserSearchDTO;
 import com.leeroy.forwordpanel.forwordpanel.model.User;
 import com.leeroy.forwordpanel.forwordpanel.model.UserPort;
@@ -157,7 +158,7 @@ public class UserController {
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ResponseBody
     public ApiResponse delete(@RequestParam("id") Integer id) {
-        List<UserPort> userPortList = userPortService.findUserPortList(id);
+        List<UserPortDTO> userPortList = userPortService.findUserPortList(id);
         if(!CollectionUtils.isEmpty(userPortList)){
             return ApiResponse.error("401", "请先删除用户端口");
         }

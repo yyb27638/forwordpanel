@@ -27,7 +27,8 @@ $(function () {
                             return host
                         }
                     }}
-                , {field: 'localPort', title: '中转端口', align: 'center'}
+                , {field: 'localPort', title: '本地端口', align: 'center'}
+                , {field: 'internetPort', title: '外网端口', align: 'center'}
                 , {field: 'remoteHost', title: '被中转域名(IP)', align: 'center'}
                 , {field: 'remoteIp', title: '被中转IP', align: 'center'}
                 , {field: 'remotePort', title: '被中转端口', align: 'center'}
@@ -112,6 +113,7 @@ function startForward(data, title) {
     $("#localPort").val(data.localPort);
     $("#remoteHost").val(data.remoteHost);
     $("#remotePort").val(data.remotePort);
+    $("#portId").val(data.portId);
     layer.open({
         type: 1,
         title: title,

@@ -70,7 +70,7 @@ public class PortService {
         //过滤掉已经分配的端口
         return portList.stream().filter(port -> {
             for (UserPort userPort : userPortList) {
-                if(userPort.getLocalPort().equals(port.getInternetPort())){
+                if(userPort.getPortId().equals(port.getId())){
                     return false;
                 }
             }

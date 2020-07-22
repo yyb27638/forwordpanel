@@ -55,22 +55,21 @@ $(function () {
 });
 
 //提交表单
-function portSubmit(data) {
+function portSubmit(saveData) {
 
     $.ajax({
         type: "POST",
-        data: JSON.stringify(data.field?data.field:data),
+        data: JSON.stringify(saveData.field?saveData.field:saveData),
         contentType: "application/json",
         url: "/port/save",
         success: function (data) {
             if (data.code === "0") {
-                if(!data.id){
-                    layer.msg("保存成功", function () {
+                if(saveData.field){
+                    layer.alert("保存成功", function () {
                         layer.closeAll();
                         load();
                     });
                 }
-
             } else {
                 layer.alert(data.msg);
             }
