@@ -9,9 +9,9 @@ import com.leeroy.forwordpanel.forwordpanel.common.util.BeanCopyUtil;
 import com.leeroy.forwordpanel.forwordpanel.dao.PortDao;
 import com.leeroy.forwordpanel.forwordpanel.dao.UserPortDao;
 import com.leeroy.forwordpanel.forwordpanel.dao.UserPortForwardDao;
-import com.leeroy.forwordpanel.forwordpanel.dto.UserPortDTO;
 import com.leeroy.forwordpanel.forwordpanel.dto.UserPortForwardDTO;
 import com.leeroy.forwordpanel.forwordpanel.model.Port;
+import com.leeroy.forwordpanel.forwordpanel.model.User;
 import com.leeroy.forwordpanel.forwordpanel.model.UserPort;
 import com.leeroy.forwordpanel.forwordpanel.model.UserPortForward;
 import lombok.extern.slf4j.Slf4j;
@@ -127,29 +127,33 @@ public class UserPortForwardService {
         if (!apiResponse.getSuccess()) {
             return apiResponse;
         }
-        Integer userId = WebCurrentData.getUserId();
-        //检查用户是否拥有此端口
-        LambdaQueryWrapper<UserPort> userPortQueryWrapper = Wrappers.<UserPort>lambdaQuery().eq(UserPort::getUserId, userId)
-                .eq(UserPort::getDeleted, false);
-        List<UserPort> existUserPortList = userPortDao.selectList(userPortQueryWrapper);
-        Boolean hasPort = false;
-        for (UserPort userPort : existUserPortList) {
-            if (userPort.getPortId().equals(userPortForward.getPortId())) {
-                if (userPort.getDisabled()) {
-                    return ApiResponse.error("403", "端口已被管理员禁用,请联系管理员");
+        User user = WebCurrentData.getUser();
+        if (user.getUserType() > 0) {
+            Integer userId = WebCurrentData.getUserId();
+            //检查用户是否拥有此端口
+            LambdaQueryWrapper<UserPort> userPortQueryWrapper = Wrappers.<UserPort>lambdaQuery().eq(UserPort::getUserId, userId)
+                    .eq(UserPort::getDeleted, false);
+            List<UserPort> existUserPortList = userPortDao.selectList(userPortQueryWrapper);
+            Boolean hasPort = false;
+            for (UserPort userPort : existUserPortList) {
+                if (userPort.getPortId().equals(userPortForward.getPortId())) {
+                    if (userPort.getDisabled()) {
+                        return ApiResponse.error("403", "端口已被管理员禁用,请联系管理员");
+                    }
+                    hasPort = true;
+                    break;
                 }
-                hasPort = true;
-                break;
             }
-        }
-        if (!hasPort) {
-            return ApiResponse.error("403", "用户没有此端口的权限");
+            if (!hasPort) {
+                return ApiResponse.error("403", "用户没有此端口的权限");
+            }
+
         }
         if (StringUtils.isBlank(userPortForward.getRemoteHost()) || userPortForward.getRemotePort() == null) {
             return ApiResponse.error("401", "请填写域名(IP)|端口");
         }
         //查询该端口已经存在的转发
-        LambdaQueryWrapper<UserPortForward> queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userPortForward.getUserId())
+        LambdaQueryWrapper<UserPortForward> queryWrapper = Wrappers.<UserPortForward>lambdaQuery()
                 .eq(UserPortForward::getPortId, userPortForward.getPortId()).eq(UserPortForward::getDeleted, false);
         UserPortForward portForward = userPortForwardDao.selectOne(queryWrapper);
         if (!portForward.getDisabled()) {
@@ -158,7 +162,7 @@ public class UserPortForwardService {
             forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
         }
         String remoteIp = getRemoteIp(userPortForward.getRemoteHost());
-        if(StringUtils.isBlank(remoteIp)){
+        if (StringUtils.isBlank(remoteIp)) {
             return ApiResponse.error("401", "域名解析错误");
         }
         userPortForward.setRemoteIp(remoteIp);
