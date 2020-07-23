@@ -23,8 +23,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 用户中转
@@ -65,9 +67,9 @@ public class UserPortForwardService {
         }
         List<UserPortForward> userPortForwardList = userPortForwardDao.selectList(queryWrapper);
         List<UserPortForwardDTO> userPortForwardDTOList = BeanCopyUtil.copyListProperties(userPortForwardList, UserPortForwardDTO::new);
+        Map<String, String> portFlowMap = forwardService.getPortFlowMap(userPortForwardDTOList.stream().map(userPortForwardDTO -> userPortForwardDTO.getRemoteIp()).collect(Collectors.toList()));
         for (UserPortForwardDTO userPortForward : userPortForwardDTOList) {
-            String flow = forwardService.getPortFlow(userPortForward.getRemoteIp(), userPortForward.getRemotePort());
-            userPortForward.setDataUsage(Long.valueOf(flow));
+            userPortForward.setDataUsage(Long.valueOf(portFlowMap.get(userPortForward.getRemoteIp())));
             Port port = portDao.selectById(userPortForward.getPortId());
             if(port!=null){
                 userPortForward.setLocalPort(port.getLocalPort());

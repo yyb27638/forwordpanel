@@ -31,7 +31,7 @@ public class SSHCommandExecutor {
         stdout = new Vector<>();
     }
 
-    public int execute(final String command) {
+    public int execute(final String... commandList) {
         stdout.clear();
         int returnCode = 0;
         JSch jsch = new JSch();
@@ -43,32 +43,30 @@ public class SSHCommandExecutor {
             session.setPassword(password);
             session.setUserInfo(userInfo);
             session.connect();
+            for (String command : commandList) {
+                // Create and connect channel.
+                Channel channel = session.openChannel("exec");
+                ((ChannelExec) channel).setCommand(command);
+                channel.setInputStream(null);
+                BufferedReader input = new BufferedReader(new InputStreamReader(channel
+                        .getInputStream()));
+                channel.connect();
+                log.info("The remote command is: {}" , command);
 
-            // Create and connect channel.
-            Channel channel = session.openChannel("exec");
-            ((ChannelExec) channel).setCommand(command);
-
-            channel.setInputStream(null);
-            BufferedReader input = new BufferedReader(new InputStreamReader(channel
-                    .getInputStream()));
-
-            channel.connect();
-            log.info("The remote command is: {}" , command);
-
-            // Get the output of remote command.
-            String line;
-            while ((line = input.readLine()) != null) {
-                stdout.add(line);
+                // Get the output of remote command.
+                String line;
+                while ((line = input.readLine()) != null) {
+                    stdout.add(line);
+                }
+                input.close();
+                // Get the return code only after the channel is closed.
+                if (channel.isClosed()) {
+                    returnCode = channel.getExitStatus();
+                }
+                // Disconnect the channel and session.
+                channel.disconnect();
             }
-            input.close();
 
-            // Get the return code only after the channel is closed.
-            if (channel.isClosed()) {
-                returnCode = channel.getExitStatus();
-            }
-
-            // Disconnect the channel and session.
-            channel.disconnect();
             session.disconnect();
         } catch (JSchException e) {
             // TODO Auto-generated catch block
@@ -90,10 +88,12 @@ public class SSHCommandExecutor {
 
     public static void main(final String [] args) {
         SSHCommandExecutor sshExecutor = new SSHCommandExecutor("120.241.154.4", "root", "28L8CegNk9");
-        sshExecutor.execute("netstat -tunlp");
+        long stsart = System.currentTimeMillis();
+        sshExecutor.execute("netstat -tunlp", "netstat -tunlp" , "netstat -tunlp", "netstat -tunlp");
         Vector<String> stdout = sshExecutor.getResultSet();
         for (String str : stdout) {
             System.out.println(str);
         }
+        System.out.println(System.currentTimeMillis()-stsart);
     }
 }

@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.*;
+
 @Slf4j
 @Service
 public class RemoteForwardService {
@@ -59,6 +61,32 @@ public class RemoteForwardService {
         result = result.replaceAll("\n", "");
         log.info("flow:{}", result);
         return StringUtils.isEmpty(result) ? "0" : result;
+    }
+
+
+    /**
+     * 获取转发流量
+     *
+     * @param remoteHostList
+     * @return
+     */
+    public Map<String, String> getPortFlowMap(List<String> remoteHostList) {
+        Map<String, String> resultMap = new HashMap<>();
+        Map<String, String> commandList = new HashMap<>();
+        for (String remoteHost : remoteHostList) {
+            if(StringUtils.isEmpty(remoteHost)){
+                resultMap.put(remoteHost, "0");
+            }else {
+                commandList.put(remoteHost,String.format("iptables -n -v -L -t filter -x | grep %s | awk '{print $2}'", remoteHost));
+            }
+        }
+
+        sshExecutor.execute(commandList.values().toArray(new String[]{}));
+        Vector<String> resultSet = sshExecutor.getResultSet();
+        for (int i = 0; i < resultSet.size(); i++) {
+            resultMap.put((String) commandList.keySet().toArray()[i],resultSet.get(i));
+        }
+        return resultMap;
     }
 
 
