@@ -1,4 +1,4 @@
-package com.leeroy.forwordpanel.forwordpanel.model;
+package com.leeroy.forwordpanel.forwordpanel.dto;
 
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -13,11 +13,12 @@ import java.util.Date;
  * 端口
  */
 @Data
-public class UserPort {
+public class UserPortDTO {
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
     private Integer userId;
     private Integer portId;
+    private Integer localPort;
     private Boolean disabled;
     private Boolean deleted;
     /**

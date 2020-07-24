@@ -175,6 +175,18 @@ public class UserService {
         return ApiResponse.ok();
     }
 
+
+    /**
+     * 禁用用户
+     *
+     * @param id
+     * @return
+     */
+    public ApiResponse disableUserById(Integer id) {
+        userDao.updateDisable(true, id);
+        return ApiResponse.ok();
+    }
+
     /**
      * 启用用户
      *
@@ -212,5 +224,12 @@ public class UserService {
     public void updatePwd(String userName, String password) {
         password = DigestUtils.Md5(userName, password);
         userDao.updatePwd(userName, password);
+    }
+
+
+    public List<User> findExpireUserList(){
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>lambdaQuery().lt(User::getExpireTime, new Date())
+                .eq(User::getDeleted, false).eq(User::getDisabled, false);
+        return userDao.selectList(queryWrapper);
     }
 }

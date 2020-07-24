@@ -27,12 +27,14 @@ $(function () {
                             return host
                         }
                     }}
-                , {field: 'localPort', title: '中转端口', align: 'center'}
+                , {field: 'localPort', title: '本地端口', align: 'center'}
+                , {field: 'internetPort', title: '外网端口', align: 'center'}
                 , {field: 'remoteHost', title: '被中转域名(IP)', align: 'center'}
                 , {field: 'remoteIp', title: '被中转IP', align: 'center'}
                 , {field: 'remotePort', title: '被中转端口', align: 'center'}
                 , {field: 'disabled', title: '是否禁用', align: 'center'}
                 , {field: 'dataUsage', title: '流量', align: 'center'}
+                , {field: 'username', title: '用户名', align: 'center'}
                 , {title: '操作', width: 300, align: 'center', toolbar: '#optBar'}
             ]],
             done: function (res, curr, count) {
@@ -40,11 +42,11 @@ $(function () {
                 //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
                 //console.log(res);
                 //得到当前页码
-                console.log(curr);
+
                 $("[data-field='disabled']").children().each(function () {
-                    if ($(this).text() == true) {
+                    if ($(this).text() === "true") {
                         $(this).text("停用")
-                    } else if ($(this).text() == false) {
+                    } else if ($(this).text()=== "false") {
                         $(this).text("启用")
                     }
                 });
@@ -55,6 +57,14 @@ $(function () {
                         $(this).text(formatBytes(parseInt(usage, 10)))
                     }
                     row++
+                });
+                var that = this.elem.next();
+                res.data.forEach(function (item, index) {
+                    if (!item.disabled) {
+                        var tr = that.find(".layui-table-box tbody tr[data-index='" + index + "']");
+                        tr.css("background-color", "#f0f9eb");
+
+                    }
                 });
             }
         });
@@ -112,6 +122,7 @@ function startForward(data, title) {
     $("#localPort").val(data.localPort);
     $("#remoteHost").val(data.remoteHost);
     $("#remotePort").val(data.remotePort);
+    $("#portId").val(data.portId);
     layer.open({
         type: 1,
         title: title,

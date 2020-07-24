@@ -42,9 +42,9 @@ $(function () {
                 //得到当前页码
 
                 $("[data-field='disabled']").children().each(function () {
-                    if ($(this).text() === true) {
-                        $(this).text("禁用")
-                    } else if ($(this).text() === false) {
+                    if ($(this).text() === "true") {
+                        $(this).text("停用")
+                    } else if ($(this).text()=== "false") {
                         $(this).text("启用")
                     }
                 });
@@ -164,7 +164,7 @@ function formSubmit(obj) {
 function userPortFormSubmit(data) {
     console.log(data)
     data.field.id = data.field.userPortId
-    const userId = data.field.userId;
+    var userId = data.field.userId;
     $.ajax({
         type: "POST",
         data: JSON.stringify(data.field),
@@ -292,7 +292,7 @@ function delUser(obj, id, name) {
 
 function delUserPort(obj, id) {
     if (id) {
-        const confirmDialog = layer.confirm('您确定要删除端口:' + obj.localPort + '？', {
+        var confirmDialog = layer.confirm('您确定要删除端口:' + obj.localPort + '？', {
             btn: ['确认', '返回'] //按钮
         }, function () {
             $.get("/userport/delete", {"id": id}, function (data) {
@@ -406,7 +406,7 @@ function getFreePortList(){
             layui.form.render("select");
             $.each(data.data, function(index, item) {
                 $('#localPort')
-                    .append(new Option(item.internetPort, item.internetPort));
+                    .append(new Option(item.internetPort, item.id));
             });
             layui.form.render("select");
         } else {

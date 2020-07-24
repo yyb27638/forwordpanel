@@ -19,6 +19,7 @@ CREATE TABLE user_port  (
   id int NOT NULL AUTO_INCREMENT ,
   local_port int NOT NULL,
   user_id int NOT NULL ,
+  port_id int NOT NULL ,
   data_limit BIGINT,
   data_usage BIGINT,
   disabled BOOLEAN ,
@@ -88,3 +89,12 @@ CREATE TABLE server(
 
 
 alter table server add column key varchar(256) NOT NULL ;
+
+
+-- 07-22 local_port不再存储
+alter table user_port drop local_port;
+alter table user_port add local_port int default NULL;
+
+alter table user_port_forward drop local_port;
+alter table user_port_forward add local_port int default NULL;
+alter table user_port_forward add port_id int NOT NULL;

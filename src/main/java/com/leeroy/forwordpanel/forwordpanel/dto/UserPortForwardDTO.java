@@ -1,4 +1,4 @@
-package com.leeroy.forwordpanel.forwordpanel.model;
+package com.leeroy.forwordpanel.forwordpanel.dto;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -12,7 +12,7 @@ import java.util.Date;
  * 端口转发实体
  */
 @Data
-public class UserPortForward {
+public class UserPortForwardDTO {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
@@ -20,6 +20,9 @@ public class UserPortForward {
     private Integer userId;
     //端口id
     private Integer portId;
+    private Integer localPort;
+    private Integer internetPort;
+    private String username;
     // 目标ip
     private String remoteIp;
     // 目标主机地址
