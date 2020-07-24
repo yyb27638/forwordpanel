@@ -64,8 +64,6 @@ function portSubmit(saveData) {
         url: "/port/save",
         success: function (data) {
             if (data.code === "0") {
-                if(saveData.field){
-                    layer.alert("保存成功", function () {
                 if(!data.id){
                     layer.msg("保存成功",{
                         time: 1500
