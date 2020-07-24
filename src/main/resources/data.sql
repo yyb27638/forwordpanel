@@ -67,10 +67,24 @@ CREATE TABLE clash  (
 );
 
 CREATE TABLE port  (
-  id varchar(50) NOT NULL AUTO_INCREMENT,
+  id int NOT NULL AUTO_INCREMENT,
   local_port int NOT NULL ,
   internet_port int NOT NULL ,
   deleted BOOLEAN,
   create_time DATE,
   update_time DATE
 );
+
+CREATE TABLE server(
+  id int NOT NULL AUTO_INCREMENT,
+  server_name varchar(128) NOT NULL ,
+  host varchar(256) NOT NULL ,
+  port int NOT NULL ,
+  state int NOT NULL DEFAULT 1 ,
+  deleted BOOLEAN,
+  create_time DATE,
+  update_time DATE
+);
+
+
+alter table server add column key varchar(256) NOT NULL ;

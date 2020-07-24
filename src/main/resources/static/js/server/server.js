@@ -9,8 +9,8 @@ $(function () {
         laydate = layui.laydate;
         form = layui.form;
         tableIns = table.render({
-            elem: '#portList',
-            url: '/port/getList',
+            elem: '#serverList',
+            url: '/server/getList',
             method: 'get', //默认：get请求
             cellMinWidth: 80,
             page: true,
@@ -20,15 +20,17 @@ $(function () {
             },
             cols: [[
                 {type: 'numbers'}
-                , {field: 'localPort', title: '本地端口', align: 'center', edit: 'text'}
-                , {field: 'internetPort', title: '外网端口', align: 'center', edit: 'text'}
+                , {field: 'serverName', title: '服务器名称', align: 'center', edit: 'text'}
+                , {field: 'host', title: '地址', align: 'center', edit: 'text'}
+                , {field: 'port', title: '端口', align: 'center', edit: 'text'}
+                , {field: 'state', title: '状态', align: 'center', edit: 'text'}
                 , {title: '操作', width: 300, align: 'center', toolbar: '#optBar'}
             ]]
         });
 
 
         //监听工具条
-        table.on('tool(portTable)', function (obj) {
+        table.on('tool(serverTable)', function (obj) {
             var data = obj.data;
             if (obj.event === 'delete') {
                 //启动
@@ -36,17 +38,17 @@ $(function () {
             }
         });
 
-        table.on('edit(portTable)', function(obj){
+        table.on('edit(serverTable)', function(obj){
             var value = obj.value //得到修改后的值
                 ,data = obj.data //得到所在行所有键值
                 ,field = obj.field; //得到字段
             console.log("data", data)
-            portSubmit(data);
+            serverSubmit(data);
         });
 
         //监听提交
-        form.on('submit(portSubmit)', function (data) {
-            portSubmit(data);
+        form.on('submit(serverSubmit)', function (data) {
+            serverSubmit(data);
             return false;
         });
 
@@ -55,19 +57,19 @@ $(function () {
 });
 
 //提交表单
-function portSubmit(data) {
+function serverSubmit(data) {
 
     $.ajax({
         type: "POST",
         data: JSON.stringify(data.field?data.field:data),
         contentType: "application/json",
-        url: "/port/save",
+        url: "/server/save",
         success: function (data) {
             if (data.code === "0") {
                 if(!data.id){
-                    layer.msg("保存成功",{
+                    layer.msg("保存成功", {
                         time: 1500
-                    }, function () {
+                    },function () {
                         layer.closeAll();
                         load();
                     });
@@ -89,7 +91,7 @@ function portSubmit(data) {
 
 //开通用户
 function add() {
-    openPort(null, "添加配置");
+    openPort(null, "添加服务器");
 }
 
 function del(obj, id, name) {
@@ -97,7 +99,7 @@ function del(obj, id, name) {
         layer.confirm('您确定要删除吗？', {
             btn: ['确认', '返回'] //按钮
         }, function () {
-            $.post("/port/delete", {"id": id}, function (data) {
+            $.post("/server/delete", {"id": id}, function (data) {
                 if (data.code === "0") {
                     layer.alert("删除成功", function () {
                         layer.closeAll();
@@ -129,13 +131,7 @@ function openPort(data, title) {
         resize: false,
         shadeClose: true,
         area: ['800px'],
-        content: $('#portDialog'),
-        success: function () {
-            laydate.render({
-                elem: "#expireTime",
-                type: "date"
-            })
-        },
+        content: $('#serverDialog')
     });
 }
 
