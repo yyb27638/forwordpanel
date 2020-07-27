@@ -20,6 +20,8 @@ public class UserPortForward {
     private Integer userId;
     //端口id
     private Integer portId;
+    // 服务id
+    private Integer serverId;
     // 目标ip
     private String remoteIp;
     // 目标主机地址

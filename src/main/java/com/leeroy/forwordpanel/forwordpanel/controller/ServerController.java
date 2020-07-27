@@ -28,11 +28,17 @@ public class ServerController {
 
 
     @ResponseBody
-    @GetMapping("getList")
-    public ApiResponse getUserPortList(Integer userId) {
+    @GetMapping("getPage")
+    public ApiResponse getPage() {
         return ApiResponse.ok(serverService.findList());
     }
 
+
+    @ResponseBody
+    @GetMapping("getList")
+    public ApiResponse getList() {
+        return ApiResponse.ok(serverService.findList());
+    }
 
     @ResponseBody
     @RequestMapping(value = "save", method = RequestMethod.POST)

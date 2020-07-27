@@ -17,6 +17,11 @@ public class Port {
     private Integer id;
 
     /**
+     * 所属服务器
+     */
+    private Integer serverId;
+
+    /**
      * 本地端口
      */
     private Integer localPort;

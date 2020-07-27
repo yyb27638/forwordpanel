@@ -18,6 +18,7 @@ public class UserPort {
     private Integer id;
     private Integer userId;
     private Integer portId;
+    private Integer serverId;
     private Boolean disabled;
     private Boolean deleted;
     /**

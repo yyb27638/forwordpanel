@@ -1,4 +1,4 @@
-package com.leeroy.forwordpanel.forwordpanel.model;
+package com.leeroy.forwordpanel.forwordpanel.dto;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -12,15 +12,14 @@ import java.util.Date;
  * 端口信息
  */
 @Data
-public class Server {
+public class PortDTO {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-
     /**
-     * 服务器所有者
+     * 所属服务器
      */
-    private Integer ownerId;
+    private Integer serverId;
 
     /**
      * 服务器名称
@@ -28,24 +27,19 @@ public class Server {
     private String serverName;
 
     /**
-     * 服务器host
+     * 服务起ip
      */
-    private String host;
+    private String serverHost;
 
     /**
-     * ssh端口
+     * 本地端口
      */
-    private Integer port;
+    private Integer localPort;
 
     /**
-     * 服务器 key
+     * 外网端口
      */
-    private String key;
-
-    /**
-     * 服务器状态
-     */
-    private String state;
+    private Integer internetPort;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
