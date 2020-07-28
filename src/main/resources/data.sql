@@ -94,7 +94,23 @@ alter table server add column key varchar(256) NOT NULL ;
 -- 07-22 local_port不再存储
 alter table user_port drop local_port;
 alter table user_port add local_port int default NULL;
+alter table user_port add port_id int default NULL;
 
 alter table user_port_forward drop local_port;
 alter table user_port_forward add local_port int default NULL;
+delete from user_port_forward;
 alter table user_port_forward add port_id int NOT NULL;
+
+-- 07-28 增加user_server
+CREATE TABLE user_server(
+  id int NOT NULL AUTO_INCREMENT,
+  user_id int NOT NULL ,
+  server_id int NOT NULL DEFAULT 1 ,
+  deleted BOOLEAN,
+  create_time DATE,
+  update_time DATE
+);
+alter table server add column owner_id int;
+alter table port add column server_id int;
+alter table user_port add server_id int default NULL;
+alter table user_port_forward add server_id int default NULL;

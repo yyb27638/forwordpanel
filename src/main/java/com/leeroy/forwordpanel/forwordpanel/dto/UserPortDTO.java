@@ -39,4 +39,19 @@ public class UserPortDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date updateTime;
+
+    /**
+     * 所属服务器
+     */
+    private Integer serverId;
+
+    /**
+     * 服务器名称
+     */
+    private String serverName;
+
+    /**
+     * 服务起ip
+     */
+    private String serverHost;
 }

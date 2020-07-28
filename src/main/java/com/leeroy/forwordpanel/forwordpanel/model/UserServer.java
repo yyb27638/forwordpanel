@@ -18,7 +18,5 @@ public class UserServer {
      */
     private Integer serverId;
 
-    private Boolean disabled;
-
     private Boolean deleted;
 }

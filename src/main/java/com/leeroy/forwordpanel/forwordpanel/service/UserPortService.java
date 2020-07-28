@@ -2,16 +2,16 @@ package com.leeroy.forwordpanel.forwordpanel.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.leeroy.forwordpanel.forwordpanel.common.WebCurrentData;
 import com.leeroy.forwordpanel.forwordpanel.common.response.ApiResponse;
 import com.leeroy.forwordpanel.forwordpanel.common.util.BeanCopyUtil;
 import com.leeroy.forwordpanel.forwordpanel.dao.PortDao;
+import com.leeroy.forwordpanel.forwordpanel.dao.ServerDao;
 import com.leeroy.forwordpanel.forwordpanel.dao.UserPortDao;
 import com.leeroy.forwordpanel.forwordpanel.dto.UserPortDTO;
 import com.leeroy.forwordpanel.forwordpanel.model.Port;
+import com.leeroy.forwordpanel.forwordpanel.model.Server;
 import com.leeroy.forwordpanel.forwordpanel.model.UserPort;
 import com.leeroy.forwordpanel.forwordpanel.model.UserPortForward;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +26,9 @@ public class UserPortService {
 
     @Autowired
     private PortDao portDao;
+
+    @Autowired
+    private ServerDao serverDao;
 
     @Autowired
     private UserPortForwardService userPortForwardService;
@@ -66,7 +69,14 @@ public class UserPortService {
         List<UserPortDTO> userPortDTOList = BeanCopyUtil.copyListProperties(userPorts, UserPortDTO::new);
         for (UserPortDTO userPort : userPortDTOList) {
             Port port = portDao.selectById(userPort.getPortId());
-            userPort.setLocalPort(port.getLocalPort());
+            if(port!=null){
+                userPort.setLocalPort(port.getLocalPort());
+            }
+            Server server = serverDao.selectById(userPort.getServerId());
+            if(server!=null){
+                userPort.setServerName(server.getServerName());
+                userPort.setServerHost(server.getHost());
+            }
         }
         return userPortDTOList;
     }

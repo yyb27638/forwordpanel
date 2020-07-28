@@ -33,8 +33,8 @@ public class PortController {
 
     @ResponseBody
     @GetMapping("getFreePortList")
-    public ApiResponse getFreePortList(Integer userId) {
-        return ApiResponse.ok(portService.findFreePortList());
+    public ApiResponse getFreePortList(Integer userId, Integer serverId) {
+        return ApiResponse.ok(portService.findFreePortList(serverId));
     }
 
 

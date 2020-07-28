@@ -24,6 +24,14 @@
         <form id="portForm" class="layui-form" method="post" action="" style="padding:20px;">
             <input id="id" type="hidden" name="id"/>
             <div class="layui-form-item">
+                <label class="layui-form-label">所属服务器</label>
+                <div class="layui-input-inline">
+                    <select name="serverId" id="serverId" lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
                 <label class="layui-form-label">本地端口:</label>
                 <div class="layui-input-block">
                     <input id="localPort" name="localPort" required lay-verify="required"  onkeyup="this.value=this.value.replace(/\D/g,'')"

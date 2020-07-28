@@ -107,6 +107,14 @@
             <input id="userId" type="hidden" name="userId"/>
             <input id="userPortId" type="hidden" name="userPortId"/>
             <div class="layui-form-item">
+                <label class="layui-form-label">服务器</label>
+                <div class="layui-input-inline">
+                    <select name="serverId" id="serverId" lay-filter="serverId" lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
                 <label class="layui-form-label">端口</label>
                 <div class="layui-input-inline">
                     <select name="portId" id="localPort" lay-verify="required">

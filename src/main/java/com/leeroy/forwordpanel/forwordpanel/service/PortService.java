@@ -66,8 +66,11 @@ public class PortService {
             PortDTO portDTO = new PortDTO();
             BeanUtils.copyProperties(port, portDTO);
             Server server = serverDao.selectById(port.getServerId());
-            portDTO.setServerName(server.getServerName());
-            portDTO.setServerHost(server.getHost());
+            if(server!=null){
+                portDTO.setServerName(server.getServerName());
+                portDTO.setServerHost(server.getHost());
+            }
+            portDTOList.add(portDTO);
         }
         return portDTOList;
     }
@@ -77,8 +80,9 @@ public class PortService {
      *
      * @return
      */
-    public List<Port> findFreePortList() {
-        LambdaQueryWrapper<Port> queryWrapper = Wrappers.<Port>lambdaQuery().eq(Port::getDeleted, false);
+    public List<Port> findFreePortList(Integer serverId) {
+        //todo serverId权限校验
+        LambdaQueryWrapper<Port> queryWrapper = Wrappers.<Port>lambdaQuery().eq(Port::getDeleted, false).eq(Port::getServerId, serverId);
         List<Port> portList = portDao.selectList(queryWrapper);
         //查询出已经占用的端口
         LambdaQueryWrapper<UserPort> userPortQueryWrapper = Wrappers.<UserPort>lambdaQuery().eq(UserPort::getDeleted, false);

@@ -59,6 +59,8 @@ $(function () {
             url: '/userport/getPortList',
             cols: [[
                 {field: 'id', title: 'ID', width: 80, sort: true}
+                , {field: 'serverName', title: '服务器', align: 'center', edit: 'text'}
+                , {field: 'serverHost', title: '服务器IP', align: 'center', edit: 'text'}
                 , {field: 'localPort', title: '端口', align: 'center'}
                 , {field: 'dataLimit', title: '流量限制', align: 'center'}
                 , {field: 'disabled', title: '是否禁用', align: 'center'}
@@ -108,6 +110,14 @@ $(function () {
             formSubmit(data);
             return false;
         });
+
+
+        //监听一级分类下拉框变化
+        form.on('select(serverId)',function(res){
+            //变化就渲染第二个分类   把第一个下拉框的value传递
+            getFreePortList(res.value)
+        });
+
 
         //监听工具条
         table.on('tool(userPortTable)', function (obj) {
@@ -260,7 +270,7 @@ function addUserPort(data) {
         area: ['600px'],
         content: $('#setUserPort'),
         success: function(){
-            getFreePortList();
+            getServerList();
         },
         end: function () {
             cleanUser();
@@ -399,8 +409,8 @@ function load(obj) {
     });
 }
 
-function getFreePortList(){
-    $.get("/port/getFreePortList", function (data) {
+function getFreePortList(serverId){
+    $.get("/port/getFreePortList?serverId="+serverId, function (data) {
         if (data.code === "0") {
             $("#localPort").empty();
             layui.form.render("select");
@@ -413,7 +423,6 @@ function getFreePortList(){
             layer.alert(data.msg);
         }
     });
-
 }
 
 function loadUserPort(id) {
@@ -431,4 +440,22 @@ function cleanUser() {
     $('#roleId').html("");
     $('#telegram').html("");
     $('#userPhone').html("");
+}
+
+function getServerList(){
+    $.get("/server/getList", function (data) {
+        if (data.code === "0") {
+            $("#serverId").empty();
+            layui.form.render("select");
+            $.each(data.data, function(index, item) {
+                $('#serverId')
+                    .append(new Option(item.serverName, item.id));
+            });
+            layui.form.render("select");
+            console.log("data[0]", data.data[0])
+            getFreePortList(data.data[0].id);
+        } else {
+            layer.alert(data.msg);
+        }
+    });
 }

@@ -20,6 +20,8 @@ $(function () {
             },
             cols: [[
                 {type: 'numbers'}
+                , {field: 'serverName', title: '服务器', align: 'center', edit: 'text'}
+                , {field: 'serverHost', title: '服务器IP', align: 'center', edit: 'text'}
                 , {field: 'localPort', title: '本地端口', align: 'center', edit: 'text'}
                 , {field: 'internetPort', title: '外网端口', align: 'center', edit: 'text'}
                 , {title: '操作', width: 300, align: 'center', toolbar: '#optBar'}
@@ -131,10 +133,11 @@ function openPort(data, title) {
         area: ['800px'],
         content: $('#portDialog'),
         success: function () {
+            getServerList();
             laydate.render({
                 elem: "#expireTime",
                 type: "date"
-            })
+            });
         },
     });
 }
@@ -145,3 +148,18 @@ function load() {
     tableIns.reload({});
 }
 
+function getServerList(){
+    $.get("/server/getList", function (data) {
+        if (data.code === "0") {
+            $("#serverId").empty();
+            layui.form.render("select");
+            $.each(data.data, function(index, item) {
+                $('#serverId')
+                    .append(new Option(item.serverName, item.id));
+            });
+            layui.form.render("select");
+        } else {
+            layer.alert(data.msg);
+        }
+    });
+}
