@@ -52,7 +52,7 @@ public class UserPortService {
             userPortDao.updateById(userPort);
         }
         //创建中转记录
-        userPortForwardService.createUserPortForward(userPort.getPortId(), userPort.getUserId());
+        userPortForwardService.createUserPortForward(userPort.getServerId(), userPort.getPortId(), userPort.getUserId());
         return ApiResponse.ok();
     }
 

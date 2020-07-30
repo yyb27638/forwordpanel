@@ -1,20 +1,42 @@
 package com.leeroy.forwordpanel.forwordpanel.service;
 
 import com.alibaba.fastjson.JSON;
-import com.leeroy.forwordpanel.forwordpanel.common.util.IpUtil;
 import com.leeroy.forwordpanel.forwordpanel.common.util.remotessh.SSHCommandExecutor;
+import com.leeroy.forwordpanel.forwordpanel.model.Server;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
 public class RemoteForwardService {
 
+    @Value("ssh.privateKeyPath")
+    private String privateKeyPath;
 
-    private SSHCommandExecutor sshExecutor = new SSHCommandExecutor("120.241.154.4", "root", "28L8CegNk9");
+    private Map<Server, SSHCommandExecutor> sshCommandExecutorMap = new ConcurrentHashMap<>();
+
+    /**
+     * 获取sshExecutor
+     * @param server
+     * @return
+     */
+    public SSHCommandExecutor getSshExecutor(Server server) {
+        SSHCommandExecutor sshCommandExecutor = sshCommandExecutorMap.get(server);
+        if(sshCommandExecutor==null){
+            sshCommandExecutor = new SSHCommandExecutor(server, "root", privateKeyPath);
+            sshCommandExecutorMap.put(server, sshCommandExecutor);
+        }
+        return sshCommandExecutor;
+    }
+
 
 
     /**
@@ -24,8 +46,9 @@ public class RemoteForwardService {
      * @param remotePort
      * @param localPort
      */
-    public void addForward(String remoteHost, Integer remotePort, Integer localPort) {
-        stopForward(remoteHost, remotePort, localPort);
+    public void addForward(Server server,String remoteHost,  Integer remotePort,  Integer localPort) {
+        SSHCommandExecutor sshExecutor = getSshExecutor(server);
+        stopForward(server, remoteHost, remotePort, localPort);
         sshExecutor.execute((String.format("ip -o -4 addr list | grep -Ev '\\s(docker|lo)' | awk '{print $4}' | cut -d/ -f1 | grep -Ev '(^127\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$)|(^10\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$)|(^172\\.1[6-9]{1}[0-9]{0,1}\\.[0-9]{1,3}\\.[0-9]{1,3}$)|(^172\\.2[0-9]{1}[0-9]{0,1}\\.[0-9]{1,3}\\.[0-9]{1,3}$)|(^172\\.3[0-1]{1}[0-9]{0,1}\\.[0-9]{1,3}\\.[0-9]{1,3}$)|(^192\\.168\\.[0-9]{1,3}\\.[0-9]{1,3}$)'", localPort, remoteHost, remotePort)));
         String localIp = sshExecutor.getResult();
         if(StringUtils.isEmpty(localIp)){
@@ -48,11 +71,12 @@ public class RemoteForwardService {
     /**
      * 获取转发流量
      *
-     * @param remoteHost
+     * @param server
      * @param remotePort
      * @return
      */
-    public String getPortFlow(String remoteHost, Integer remotePort) {
+    public String getPortFlow(Server server, String remoteHost, Integer remotePort) {
+        SSHCommandExecutor sshExecutor = getSshExecutor(server);
         if(StringUtils.isEmpty(remoteHost)){
             return "0";
         }
@@ -70,7 +94,8 @@ public class RemoteForwardService {
      * @param remoteHostList
      * @return
      */
-    public Map<String, String> getPortFlowMap(List<String> remoteHostList) {
+    public Map<String, String> getPortFlowMap(Server server, List<String> remoteHostList) {
+        SSHCommandExecutor sshExecutor = getSshExecutor(server);
         Map<String, String> resultMap = new HashMap<>();
         Map<String, String> commandList = new HashMap<>();
         for (String remoteHost : remoteHostList) {
@@ -96,7 +121,8 @@ public class RemoteForwardService {
      * @param remoteHost
      * @param remotePort
      */
-    public void resetFlowCount(String remoteHost, Integer remotePort) {
+    public void resetFlowCount(Server server, String remoteHost, Integer remotePort) {
+        SSHCommandExecutor sshExecutor = getSshExecutor(server);
         sshExecutor.execute(String.format("iptables -Z FORWARD -p tcp --dport %s -d %s", remotePort, remoteHost));
         sshExecutor.execute(String.format("iptables -Z FORWARD -p udp --dport %s -d %s", remotePort, remoteHost));
     }
@@ -107,7 +133,8 @@ public class RemoteForwardService {
      * @param remoteHost
      * @param remotePort
      */
-    public void deleteFlowCount(String remoteHost, Integer remotePort) {
+    public void deleteFlowCount(Server server, String remoteHost, Integer remotePort) {
+        SSHCommandExecutor sshExecutor = getSshExecutor(server);
         sshExecutor.execute(String.format("iptables -D FORWARD -p tcp --dport %s -d %s", remotePort, remoteHost));
         sshExecutor.execute(String.format("iptables -D FORWARD -p udp --dport %s -d %s", remotePort, remoteHost));
     }
@@ -120,7 +147,8 @@ public class RemoteForwardService {
      * @param remotePort
      * @param localPort
      */
-    public void stopForward(String remoteHost, Integer remotePort, Integer localPort) {
+    public void stopForward(Server server, String remoteHost, Integer remotePort, Integer localPort) {
+        SSHCommandExecutor sshExecutor = getSshExecutor(server);
         sshExecutor.execute(String.format("iptables -L PREROUTING -n -t nat --line-number |grep DNAT|grep \"dpt:%d \"|sort -r|awk '{print $1,$3,$9}'|tr \" \" \":\"|tr \"\\n\" \" \"", localPort));
         String dnatStr = sshExecutor.getResult();
         log.info(dnatStr);

@@ -19,14 +19,8 @@ $(function () {
             },
             cols: [[
                 {type: 'numbers'}
-                , {field: 'localPort', title: '中转IP', align: 'center', templet: function(d){
-                        var host = window.location.host;
-                        if(host.indexOf(':')>0){
-                            return host.split(':')[0]
-                        }else {
-                            return host
-                        }
-                    }}
+                , {field: 'serverName', title: '中转服务器', align: 'center'}
+                , {field: 'serverHost', title: '中转IP', align: 'center'}
                 , {field: 'localPort', title: '本地端口', align: 'center'}
                 , {field: 'internetPort', title: '外网端口', align: 'center'}
                 , {field: 'remoteHost', title: '被中转域名(IP)', align: 'center'}

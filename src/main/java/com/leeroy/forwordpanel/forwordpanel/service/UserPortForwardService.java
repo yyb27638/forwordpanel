@@ -6,15 +6,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.leeroy.forwordpanel.forwordpanel.common.WebCurrentData;
 import com.leeroy.forwordpanel.forwordpanel.common.response.ApiResponse;
 import com.leeroy.forwordpanel.forwordpanel.common.util.BeanCopyUtil;
-import com.leeroy.forwordpanel.forwordpanel.dao.PortDao;
-import com.leeroy.forwordpanel.forwordpanel.dao.UserDao;
-import com.leeroy.forwordpanel.forwordpanel.dao.UserPortDao;
-import com.leeroy.forwordpanel.forwordpanel.dao.UserPortForwardDao;
+import com.leeroy.forwordpanel.forwordpanel.dao.*;
 import com.leeroy.forwordpanel.forwordpanel.dto.UserPortForwardDTO;
-import com.leeroy.forwordpanel.forwordpanel.model.Port;
-import com.leeroy.forwordpanel.forwordpanel.model.User;
-import com.leeroy.forwordpanel.forwordpanel.model.UserPort;
-import com.leeroy.forwordpanel.forwordpanel.model.UserPortForward;
+import com.leeroy.forwordpanel.forwordpanel.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -48,6 +43,9 @@ public class UserPortForwardService {
     private UserDao userDao;
 
     @Autowired
+    private ServerDao serverDao;
+
+    @Autowired
     private RemoteForwardService forwardService;
 
     /**
@@ -67,7 +65,7 @@ public class UserPortForwardService {
         }
         List<UserPortForward> userPortForwardList = userPortForwardDao.selectList(queryWrapper);
         List<UserPortForwardDTO> userPortForwardDTOList = BeanCopyUtil.copyListProperties(userPortForwardList, UserPortForwardDTO::new);
-        Map<String, String> portFlowMap = forwardService.getPortFlowMap(userPortForwardDTOList.stream().map(userPortForwardDTO -> userPortForwardDTO.getRemoteIp()).collect(Collectors.toList()));
+        Map<String, String> portFlowMap = getPortFlowMap(userPortForwardDTOList);
         for (UserPortForwardDTO userPortForward : userPortForwardDTOList) {
             userPortForward.setDataUsage(Long.valueOf(portFlowMap.get(userPortForward.getRemoteIp())));
             Port port = portDao.selectById(userPortForward.getPortId());
@@ -78,9 +76,32 @@ public class UserPortForwardService {
             if(user!=null){
                 userPortForward.setUsername(user.getUsername());
             }
+            Server server = serverDao.selectById(userPortForward.getServerId());
+            if(server!=null){
+                userPortForward.setServerHost(server.getHost());
+                userPortForward.setServerName(server.getServerName());
+            }
             userPortForward.setInternetPort(port.getInternetPort());
         }
         return ApiResponse.ok(userPortForwardDTOList);
+    }
+
+    /**
+     * 获取流量
+     * @return
+     */
+    private Map<String, String> getPortFlowMap(List<UserPortForwardDTO> userPortForwardDTOList){
+        Map<String, String> result = new HashMap<>();
+        //根据server分组
+        Map<Integer, List<UserPortForwardDTO>> portForwardMap = userPortForwardDTOList.stream().collect(Collectors.groupingBy(UserPortForwardDTO::getServerId));
+        for (Integer serverId : portForwardMap.keySet()) {
+            Server server = serverDao.selectById(serverId);
+            List<UserPortForwardDTO> userPortForwardDTOS = portForwardMap.get(serverId);
+            List<String> remoteHostList = userPortForwardDTOS.stream().map(UserPortForwardDTO::getRemoteHost).collect(Collectors.toList());
+            Map<String, String> portFlowMap = forwardService.getPortFlowMap(server, remoteHostList);
+            result.putAll(portFlowMap);
+        }
+        return result;
     }
 
 
@@ -90,13 +111,14 @@ public class UserPortForwardService {
      * @param portId
      * @param userId
      */
-    public void createUserPortForward(Integer portId, Integer userId) {
+    public void createUserPortForward(Integer serverId,Integer portId, Integer userId) {
         LambdaQueryWrapper<UserPortForward> queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userId)
                 .eq(UserPortForward::getPortId, portId).eq(UserPortForward::getDeleted, false);
         UserPortForward exist = userPortForwardDao.selectOne(queryWrapper);
         if (exist == null) {
             UserPortForward userPortForward = new UserPortForward();
             userPortForward.setPortId(portId);
+            userPortForward.setServerId(serverId);
             userPortForward.setUserId(userId);
             userPortForward.setDeleted(false);
             userPortForward.setCreateTime(new Date());
@@ -118,7 +140,8 @@ public class UserPortForwardService {
         if (portForward != null) {
             //停止中转
             Port port = portDao.selectById(portId);
-            forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
+            Server server = serverDao.selectById(portForward.getServerId());
+            forwardService.stopForward(server, portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
         }
         //删除中转记录
         queryWrapper = Wrappers.<UserPortForward>lambdaQuery().eq(UserPortForward::getUserId, userId)
@@ -171,7 +194,8 @@ public class UserPortForwardService {
         if (!portForward.getDisabled()) {
             //停止中转
             Port port = portDao.selectById(portForward.getPortId());
-            forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
+            Server server = serverDao.selectById(portForward.getServerId());
+            forwardService.stopForward(server, portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
         }
         String remoteIp = getRemoteIp(userPortForward.getRemoteHost());
         if (StringUtils.isBlank(remoteIp)) {
@@ -180,8 +204,9 @@ public class UserPortForwardService {
         userPortForward.setRemoteIp(remoteIp);
 
         Port port = portDao.selectById(userPortForward.getPortId());
+        Server server = serverDao.selectById(userPortForward.getServerId());
         //开始新的中转
-        forwardService.addForward(userPortForward.getRemoteIp(), userPortForward.getRemotePort(), port.getLocalPort());
+        forwardService.addForward(server, userPortForward.getRemoteIp(), userPortForward.getRemotePort(), port.getLocalPort());
         //更新中转信息
         portForward.setUpdateTime(new Date());
         portForward.setRemoteIp(userPortForward.getRemoteIp());
@@ -209,7 +234,8 @@ public class UserPortForwardService {
         UserPortForward portForward = userPortForwardDao.selectOne(queryWrapper);
         if (!portForward.getDisabled()) {
             //停止中转
-            forwardService.stopForward(portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
+            Server server = serverDao.selectById(portForward.getServerId());
+            forwardService.stopForward(server, portForward.getRemoteIp(), portForward.getRemotePort(), port.getLocalPort());
         }
         //停止中转记录
         userPortForwardDao.updateDisable(true, portForward.getId());

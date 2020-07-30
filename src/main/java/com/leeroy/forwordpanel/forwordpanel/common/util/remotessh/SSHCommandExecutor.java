@@ -1,12 +1,14 @@
 package com.leeroy.forwordpanel.forwordpanel.common.util.remotessh;
 
 import com.jcraft.jsch.*;
+import com.leeroy.forwordpanel.forwordpanel.model.Server;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Properties;
 import java.util.Vector;
 
 /**
@@ -20,6 +22,8 @@ public class SSHCommandExecutor {
 
     private String password;
 
+    private String privateKeyPath;
+
     public static final int DEFAULT_SSH_PORT = 34204;
 
     private Vector<String> stdout;
@@ -31,17 +35,26 @@ public class SSHCommandExecutor {
         stdout = new Vector<>();
     }
 
+    public SSHCommandExecutor(Server server, final String username, final String privateKeyPath) {
+        this.ipAddress = server.getHost();
+        this.username = username;
+        this.privateKeyPath = privateKeyPath;
+        stdout = new Vector<>();
+    }
+
     public int execute(final String... commandList) {
         stdout.clear();
         int returnCode = 0;
         JSch jsch = new JSch();
-        MyUserInfo userInfo = new MyUserInfo();
-
         try {
+            jsch.addIdentity(privateKeyPath);
+            MyUserInfo userInfo = new MyUserInfo();
             // Create and connect session.
             Session session = jsch.getSession(username, ipAddress, DEFAULT_SSH_PORT);
-            session.setPassword(password);
             session.setUserInfo(userInfo);
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
             session.connect();
             for (String command : commandList) {
                 // Create and connect channel.
@@ -51,7 +64,7 @@ public class SSHCommandExecutor {
                 BufferedReader input = new BufferedReader(new InputStreamReader(channel
                         .getInputStream()));
                 channel.connect();
-                log.info("The remote command is: {}" , command);
+                log.info("The remote command is: {}", command);
 
                 // Get the output of remote command.
                 String line;
@@ -83,17 +96,17 @@ public class SSHCommandExecutor {
     }
 
     public String getResult() {
-        return CollectionUtils.isEmpty(stdout)?"":stdout.get(0);
+        return CollectionUtils.isEmpty(stdout) ? "" : stdout.get(0);
     }
 
-    public static void main(final String [] args) {
+    public static void main(final String[] args) {
         SSHCommandExecutor sshExecutor = new SSHCommandExecutor("120.241.154.4", "root", "28L8CegNk9");
         long stsart = System.currentTimeMillis();
-        sshExecutor.execute("netstat -tunlp", "netstat -tunlp" , "netstat -tunlp", "netstat -tunlp");
+        sshExecutor.execute("netstat -tunlp", "netstat -tunlp", "netstat -tunlp", "netstat -tunlp");
         Vector<String> stdout = sshExecutor.getResultSet();
         for (String str : stdout) {
             System.out.println(str);
         }
-        System.out.println(System.currentTimeMillis()-stsart);
+        System.out.println(System.currentTimeMillis() - stsart);
     }
 }
