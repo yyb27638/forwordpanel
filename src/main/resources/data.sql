@@ -114,3 +114,6 @@ alter table server add column owner_id int;
 alter table port add column server_id int;
 alter table user_port add server_id int default NULL;
 alter table user_port_forward add server_id int default NULL;
+
+alter table server add column username varchar(128);
+alter table server add column password varchar(128);

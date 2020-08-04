@@ -67,7 +67,8 @@ public class UserPortForwardService {
         List<UserPortForwardDTO> userPortForwardDTOList = BeanCopyUtil.copyListProperties(userPortForwardList, UserPortForwardDTO::new);
         Map<String, String> portFlowMap = getPortFlowMap(userPortForwardDTOList);
         for (UserPortForwardDTO userPortForward : userPortForwardDTOList) {
-            userPortForward.setDataUsage(Long.valueOf(portFlowMap.get(userPortForward.getRemoteIp())));
+            String flow = portFlowMap.get(userPortForward.getRemoteIp());
+            userPortForward.setDataUsage(Long.valueOf(flow==null?"0":flow));
             Port port = portDao.selectById(userPortForward.getPortId());
             if(port!=null){
                 userPortForward.setLocalPort(port.getLocalPort());
@@ -97,7 +98,7 @@ public class UserPortForwardService {
         for (Integer serverId : portForwardMap.keySet()) {
             Server server = serverDao.selectById(serverId);
             List<UserPortForwardDTO> userPortForwardDTOS = portForwardMap.get(serverId);
-            List<String> remoteHostList = userPortForwardDTOS.stream().map(UserPortForwardDTO::getRemoteHost).collect(Collectors.toList());
+            List<String> remoteHostList = userPortForwardDTOS.stream().map(UserPortForwardDTO::getRemoteIp).collect(Collectors.toList());
             Map<String, String> portFlowMap = forwardService.getPortFlowMap(server, remoteHostList);
             result.putAll(portFlowMap);
         }

@@ -18,9 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class RemoteForwardService {
 
-    @Value("ssh.privateKeyPath")
-    private String privateKeyPath;
-
     private Map<Server, SSHCommandExecutor> sshCommandExecutorMap = new ConcurrentHashMap<>();
 
     /**
@@ -31,7 +28,7 @@ public class RemoteForwardService {
     public SSHCommandExecutor getSshExecutor(Server server) {
         SSHCommandExecutor sshCommandExecutor = sshCommandExecutorMap.get(server);
         if(sshCommandExecutor==null){
-            sshCommandExecutor = new SSHCommandExecutor(server, "root", privateKeyPath);
+            sshCommandExecutor = new SSHCommandExecutor(server);
             sshCommandExecutorMap.put(server, sshCommandExecutor);
         }
         return sshCommandExecutor;

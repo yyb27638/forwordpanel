@@ -117,6 +117,7 @@ function startForward(data, title) {
     $("#remoteHost").val(data.remoteHost);
     $("#remotePort").val(data.remotePort);
     $("#portId").val(data.portId);
+    $("#serverId").val(data.serverId);
     layer.open({
         type: 1,
         title: title,

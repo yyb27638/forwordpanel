@@ -24,9 +24,17 @@ public class SSHCommandExecutor {
 
     private String privateKeyPath;
 
-    public static final int DEFAULT_SSH_PORT = 34204;
+    public int  port = 34204;
 
     private Vector<String> stdout;
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public int getPort() {
+        return port;
+    }
 
     public SSHCommandExecutor(final String ipAddress, final String username, final String password) {
         this.ipAddress = ipAddress;
@@ -35,8 +43,19 @@ public class SSHCommandExecutor {
         stdout = new Vector<>();
     }
 
+    public SSHCommandExecutor(Server server) {
+        this.ipAddress = server.getHost();
+        this.port = server.getPort();
+        this.username = server.getUsername();
+//        this.privateKeyPath = server.getPassword();
+        this.password = server.getPassword();
+        stdout = new Vector<>();
+    }
+
+
     public SSHCommandExecutor(Server server, final String username, final String privateKeyPath) {
         this.ipAddress = server.getHost();
+        this.port = server.getPort();
         this.username = username;
         this.privateKeyPath = privateKeyPath;
         stdout = new Vector<>();
@@ -46,15 +65,11 @@ public class SSHCommandExecutor {
         stdout.clear();
         int returnCode = 0;
         JSch jsch = new JSch();
+        MyUserInfo userInfo = new MyUserInfo();
         try {
-            jsch.addIdentity(privateKeyPath);
-            MyUserInfo userInfo = new MyUserInfo();
-            // Create and connect session.
-            Session session = jsch.getSession(username, ipAddress, DEFAULT_SSH_PORT);
+            Session session = jsch.getSession(username, ipAddress, port);
+            session.setPassword(password);
             session.setUserInfo(userInfo);
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
             session.connect();
             for (String command : commandList) {
                 // Create and connect channel.

@@ -74,6 +74,9 @@ public class ServerService {
             }
             return false;
         }).collect(Collectors.toList());
+        serverList.stream().forEach(server -> {
+            server.setPassword(null);
+        });
         return serverList;
     }
 

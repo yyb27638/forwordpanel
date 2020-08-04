@@ -43,6 +43,16 @@ public class Server {
     private String key;
 
     /**
+     * 密码
+     */
+    private String username;
+
+    /**
+     * 用户名
+     */
+    private String password;
+
+    /**
      * 服务器状态
      */
     private String state;

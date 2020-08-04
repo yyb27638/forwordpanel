@@ -43,6 +43,20 @@
                            onafterpaste="this.value=this.value.replace(/\D/g,'')" required lay-verify="required" placeholder="请输入" type="text" class="layui-input"></input>
                 </div>
             </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名:</label>
+                <div class="layui-input-block">
+                    <input id="username" name="username"
+                            required lay-verify="required" placeholder="请输入" type="text" class="layui-input"></input>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码:</label>
+                <div class="layui-input-block">
+                    <input id="password" name="password"
+                            required lay-verify="required" placeholder="请输入" type="text" class="layui-input"></input>
+                </div>
+            </div>
             <button class="layui-btn" lay-submit="" lay-filter="serverSubmit">保存</button>
         </form>
     </div>
