@@ -25,7 +25,6 @@ $(function () {
                 , {field: 'port', title: '端口', align: 'center', edit: 'text'}
                 , {field: 'username', title: '用户名', align: 'center', edit: 'text'}
                 , {field: 'password', title: '密码', align: 'center', edit: 'text'}
-                , {field: 'state', title: '状态', align: 'center', edit: 'text'}
                 , {title: '操作', width: 300, align: 'center', toolbar: '#optBar'}
             ]]
         });
