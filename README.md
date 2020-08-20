@@ -17,13 +17,8 @@
 ### 4.配置管理
 可以托管一些配置, 这个自己灵活运用
 
-### 图片
-![53564855-70e8-4fa4-b8c3-1a7bca94e35b-image.png](/assets/uploads/files/1597927557126-53564855-70e8-4fa4-b8c3-1a7bca94e35b-image.png) 
-
-![ec36dbf1-51af-40be-a2bf-3e7f1405d954-image.png](/assets/uploads/files/1597927598320-ec36dbf1-51af-40be-a2bf-3e7f1405d954-image.png) 
-
-![cf270c3b-e53d-4642-a22d-cebb26cb40af-image.png](/assets/uploads/files/1597927655901-cf270c3b-e53d-4642-a22d-cebb26cb40af-image.png) 
-
-![84467712-1d3f-4199-8d69-fd50b5a6d59e-image.png](/assets/uploads/files/1597927719987-84467712-1d3f-4199-8d69-fd50b5a6d59e-image.png) 
-
-![ec5726e0-00d7-4333-b756-382aa8f62e9f-image.png](/assets/uploads/files/1597927833348-ec5726e0-00d7-4333-b756-382aa8f62e9f-image.png)
+![dJMS8s.png](https://s1.ax1x.com/2020/08/20/dJMS8s.png)
+![dJMtGd.png](https://s1.ax1x.com/2020/08/20/dJMtGd.png)
+![dJMgRs.png](https://s1.ax1x.com/2020/08/20/dJMgRs.png)
+![dJM5ZT.png](https://s1.ax1x.com/2020/08/20/dJM5ZT.png)
+![dJMjL6.png](https://s1.ax1x.com/2020/08/20/dJMjL6.png)
